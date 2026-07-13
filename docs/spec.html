@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spec — Iniciativa 07: Generador de Design Systems con IA</title>
+<style>
+  :root{
+    --ink:#1c1b1f;
+    --paper:#faf9f6;
+    --panel:#ffffff;
+    --line:#e4e1d8;
+    --muted:#6f6b60;
+    --primary:#2a4d3e;      /* verde bosque - "marca" de la demo */
+    --on-primary:#f2f7f2;
+    --primary-container:#dfeee2;
+    --accent:#c66a3a;       /* terracota derivado, usado con moderación */
+    --code-bg:#efece2;
+    --radius-card: 14px;
+    --radius-chip: 999px;
+    --maxw: 880px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: 'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+    line-height:1.65;
+    font-size:17px;
+  }
+  ::selection{ background:var(--primary-container); }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 240px minmax(0,1fr);
+    gap:0;
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  /* ---------- Sidebar ---------- */
+  nav.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:38px 20px 40px 32px;
+    border-right:1px solid var(--line);
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .toc-brand{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .toc-title{
+    font-family:'Iowan Old Style',Georgia,serif;
+    font-size:17px;
+    font-weight:600;
+    color:var(--primary);
+    margin-bottom:26px;
+    line-height:1.35;
+  }
+  nav.toc ul{list-style:none;margin:0;padding:0;}
+  nav.toc li{margin-bottom:2px;}
+  nav.toc a{
+    display:block;
+    padding:7px 10px;
+    font-size:13.5px;
+    color:var(--muted);
+    text-decoration:none;
+    border-radius:8px;
+    transition:background .15s, color .15s;
+  }
+  nav.toc a:hover{ background:var(--primary-container); color:var(--primary); }
+  nav.toc .status{
+    margin-top:28px;
+    padding:12px 14px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:12px;
+    color:var(--muted);
+  }
+  nav.toc .status strong{ display:block; color:var(--ink); font-size:12.5px; margin-bottom:3px;}
+
+  /* ---------- Main content ---------- */
+  main{
+    padding:64px 56px 100px;
+    max-width:var(--maxw);
+  }
+
+  header.hero{
+    margin-bottom:56px;
+    padding-bottom:36px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:11.5px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  h1{
+    font-size:2.5rem;
+    line-height:1.15;
+    margin:0 0 18px;
+    color:var(--ink);
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .meta-row{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13px;
+    color:var(--muted);
+  }
+  .meta-row b{color:var(--ink);}
+
+  h2{
+    font-size:1.5rem;
+    color:var(--primary);
+    margin:64px 0 8px;
+    padding-bottom:10px;
+    border-bottom:2px solid var(--primary-container);
+    font-weight:600;
+  }
+  h2 .num{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    color:var(--accent);
+    font-size:.85rem;
+    font-weight:700;
+    margin-right:10px;
+    letter-spacing:.02em;
+  }
+  h3{
+    font-size:1.12rem;
+    color:var(--ink);
+    margin:34px 0 10px;
+    font-weight:600;
+  }
+  p{ margin:14px 0; color:#33312c; }
+  strong{ color:var(--ink); }
+  a{ color:var(--accent); text-decoration-thickness: 1px; }
+
+  .lead{
+    font-size:1.08rem;
+    color:#4a473f;
+  }
+
+  /* callout boxes */
+  .callout{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:4px solid var(--primary);
+    border-radius:8px;
+    padding:18px 20px;
+    margin:22px 0;
+    font-size:.97rem;
+  }
+  .callout.short .eyebrow-small{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--primary);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+
+  /* flow diagram */
+  .flow{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius-card);
+    padding:28px 26px;
+    margin:24px 0;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .flow-step{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    padding:9px 0;
+  }
+  .flow-step .dot{
+    flex:0 0 auto;
+    width:9px;height:9px;
+    border-radius:50%;
+    background:var(--primary);
+    margin-top:7px;
+  }
+  .flow-step.branch .dot{ background:var(--accent); }
+  .flow-step .txt{ font-size:14.5px; color:#3a382f; }
+  .flow-step .txt b{ color:var(--ink); }
+  .flow-arrow{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    padding:2px 0 2px 23px;
+    font-family: Georgia, serif;
+  }
+  .flow-branches{
+    margin-left:23px;
+    padding-left:18px;
+    border-left:2px dashed var(--line);
+  }
+
+  /* rules list */
+  ul.rules{ margin:16px 0; padding-left:0; list-style:none; }
+  ul.rules li{
+    position:relative;
+    padding:10px 0 10px 26px;
+    border-bottom:1px solid var(--line);
+    font-size:.97rem;
+  }
+  ul.rules li:last-child{ border-bottom:none; }
+  ul.rules li::before{
+    content:"→";
+    position:absolute;
+    left:0;
+    color:var(--accent);
+    font-weight:700;
+  }
+
+  /* table */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:20px 0;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:14.5px;
+  }
+  th{
+    text-align:left;
+    background:var(--primary);
+    color:var(--on-primary);
+    padding:11px 16px;
+    font-weight:600;
+    letter-spacing:.02em;
+  }
+  th:first-child{ border-radius:8px 0 0 0; }
+  th:last-child{ border-radius:0 8px 0 0; }
+  td{
+    padding:11px 16px;
+    border-bottom:1px solid var(--line);
+    background:var(--panel);
+    color:#33312c;
+  }
+  tr:last-child td{ border-bottom:none; }
+
+  code{
+    font-family:'SF Mono','Fira Code',Consolas,monospace;
+    background:var(--code-bg);
+    padding:2px 6px;
+    border-radius:4px;
+    font-size:.86em;
+    color:#5a4630;
+  }
+  pre{
+    background:var(--code-bg);
+    border-radius:10px;
+    padding:16px 18px;
+    overflow-x:auto;
+    font-size:13px;
+  }
+  pre code{ background:none; padding:0; }
+
+  /* ---- signature element: design-system mini preview ---- */
+  .dsp{
+    margin:26px 0 8px;
+    border:1px solid var(--line);
+    border-radius:var(--radius-card);
+    overflow:hidden;
+    background:var(--panel);
+  }
+  .dsp-head{
+    padding:14px 20px;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+  }
+  .dsp-body{ padding:22px 24px 26px; }
+  .swatches{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .swatch{
+    width:64px;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .swatch .chip{
+    height:44px;
+    border-radius:8px;
+    border:1px solid rgba(0,0,0,.06);
+    margin-bottom:5px;
+  }
+  .swatch .lbl{ font-size:9.5px; color:var(--muted); line-height:1.3; }
+  .comp-row{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    align-items:center;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .comp-card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+    width:150px;
+    background:#fff;
+  }
+  .comp-card .cctitle{ font-size:12px; font-weight:600; margin-bottom:4px;}
+  .comp-card .ccsub{ font-size:10.5px; color:var(--muted); }
+  .btn-demo{
+    display:inline-block;
+    background:var(--primary);
+    color:var(--on-primary);
+    font-size:12.5px;
+    font-weight:600;
+    padding:9px 18px;
+    border-radius:8px;
+  }
+  .input-demo{
+    border:1px solid #c9c5b8;
+    border-radius:8px;
+    padding:9px 12px;
+    font-size:12px;
+    color:var(--muted);
+    width:130px;
+  }
+  .badge-demo{
+    display:inline-block;
+    background:var(--accent);
+    color:#fff;
+    font-size:11px;
+    font-weight:600;
+    padding:5px 12px;
+    border-radius:999px;
+  }
+  .radius-row{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .radius-pill{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:11px;
+    color:var(--muted);
+    background:var(--primary-container);
+    padding:6px 12px;
+    border-radius:6px;
+  }
+
+  /* success criteria numbered */
+  ol.criteria{ padding-left:0; margin:20px 0; list-style:none; counter-reset:crit; }
+  ol.criteria li{
+    counter-increment: crit;
+    position:relative;
+    padding:14px 0 14px 46px;
+    border-bottom:1px solid var(--line);
+    font-size:.98rem;
+  }
+  ol.criteria li:last-child{ border-bottom:none; }
+  ol.criteria li::before{
+    content: counter(crit);
+    position:absolute;
+    left:0; top:12px;
+    width:28px; height:28px;
+    border-radius:50%;
+    background:var(--primary);
+    color:var(--on-primary);
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* references */
+  .refs{
+    font-size:.9rem;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+  }
+  .refs ul{ padding-left:20px; }
+  .refs li{ margin-bottom:8px; color:var(--muted); }
+
+  footer.doc-footer{
+    margin-top:70px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:12.5px;
+    color:var(--muted);
+    font-style:italic;
+  }
+
+  @media (max-width: 860px){
+    .layout{ grid-template-columns: 1fr; }
+    nav.toc{
+      position:static;
+      height:auto;
+      border-right:none;
+      border-bottom:1px solid var(--line);
+      padding:24px 20px;
+    }
+    main{ padding:40px 22px 80px; }
+    h1{ font-size:1.9rem; }
+  }
+
+  @media print{
+    nav.toc{ display:none; }
+    .layout{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="toc">
+    <div class="toc-brand">Programa AI · DxD · Baufest</div>
+    <div class="toc-title">Iniciativa 07<br>Generador de Design Systems</div>
+    <ul>
+      <li><a href="#problem-corta">Problem statement (corta)</a></li>
+      <li><a href="#problem-extendida">Problem statement (extendida)</a></li>
+      <li><a href="#arquitectura">Arquitectura de la solución</a></li>
+      <li><a href="#flujo">2.1 Flujo del usuario</a></li>
+      <li><a href="#reglas">2.2 Reglas fijas</a></li>
+      <li><a href="#stack">2.3 Stack</a></li>
+      <li><a href="#datos">2.4 Nota sobre datos</a></li>
+      <li><a href="#criterios">3. Criterios de éxito</a></li>
+      <li><a href="#referencias">Referencias</a></li>
+    </ul>
+    <div class="status">
+      <strong>Estado del documento</strong>
+      Para revisión — Sesión 1.1
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="eyebrow">Spec técnica · Autor: Laura</div>
+      <h1>Generador de Design Systems con IA</h1>
+      <p class="lead">A partir de la paleta y tipografía de una marca, la herramienta genera automáticamente un sistema de diseño completo — con reglas fijas de contraste y derivación de color — listo para exportar a Figma.</p>
+      <div class="meta-row">
+        <span><b>Programa:</b> AI — DxD</span>
+        <span><b>Empresa:</b> Baufest</span>
+        <span><b>Estado:</b> Para revisión</span>
+        <span><b>Sesión:</b> 1.1</span>
+      </div>
+    </header>
+
+    <h2 id="problem-corta"><span class="num">01</span>Problem Statement — versión corta</h2>
+    <p>Crear un design system inicial (paleta, tipografía, componentes) le toma hoy a un diseñador entre <strong>40 y 50 horas</strong> de trabajo manual: investigar referencias, probar paletas, definir cada componente por separado. Existen herramientas de IA genéricas (ChatGPT, Gemini, Google Stitch) que aceleran partes sueltas del proceso, pero ninguna resuelve el problema completo — no aplican reglas de contraste de forma sistemática ni adaptan todos los componentes bajo el mismo criterio, así que el resultado sigue siendo parcial y requiere retrabajo manual.</p>
+    <p>Esta iniciativa está dirigida a diseñadores UX/UI y equipos pequeños que necesitan un punto de partida real, no inspiración suelta. A partir de los colores y tipografía que ya tiene una marca (o de una breve descripción si es nueva), la herramienta genera automáticamente un sistema de diseño completo — con reglas fijas de contraste y derivación de color aplicadas sobre el <strong>100% de los componentes</strong> — listo para exportar a Figma.</p>
+
+    <h2 id="problem-extendida"><span class="num">02</span>Problem Statement — versión extendida</h2>
+    <p>Definir un design system inicial (paleta de colores, tipografía y componentes base) es una de las tareas más lentas y repetitivas del proceso de diseño. No es un problema anecdótico: estudios de la industria sitúan la construcción de un design system mediano en 40-50 horas de trabajo, y casos documentados de equipos reales (Lucid Software, Lago) hablan de semanas de dedicación de diseñadores y desarrolladores antes de poder empezar a diseñar producto real.</p>
+    <p>El problema no es solo de tiempo, sino de <strong>consistencia</strong>: cuando el diseñador define colores, tipografía y componentes a mano, es fácil que las decisiones no queden documentadas de forma reutilizable (qué color va dónde, qué contraste cumple accesibilidad, qué radius corresponde a cada componente), lo que genera drift entre Figma y el código más adelante.</p>
+
+    <div class="callout short">
+      <div class="eyebrow-small">Qué pasa hoy</div>
+      <p style="margin:0">Hoy existen herramientas de IA genéricas que ya se usan para acelerar partes sueltas de este proceso — sugerir una paleta, tirar ideas de tipografía. Pero ninguna resuelve el problema completo: no aplican reglas de contraste de forma sistemática, no derivan los roles de color de manera consistente, ni adaptan <strong>todos</strong> los componentes base bajo el mismo criterio. El resultado sigue siendo parcial — sirve como inspiración, no como sistema.</p>
+    </div>
+
+    <p>Esta iniciativa propone una herramienta que, a partir de los atributos de marca que el usuario ya tiene (colores, tipografía) o de una breve descripción de personalidad de marca, genere automáticamente un sistema de diseño inicial completo y coherente — paleta con roles semánticos, escala tipográfica, y un set de componentes base (botón, input, card, badge) ya adaptados a esos tokens — listo para exportarse a Figma en un formato estándar (compatible con W3C Design Tokens). El objetivo no es reemplazar el criterio del diseñador, sino comprimir de días/semanas a minutos la fase de fundamentos.</p>
+
+    <h3>Para quién</h3>
+    <p>Diseñadores UX/UI y equipos pequeños que necesitan arrancar un proyecto de branding o producto sin partir de cero.</p>
+
+    <h3>Validación de mercado</h3>
+    <p>Este no es un problema teórico. Google ya invierte en la misma dirección con <em>Stitch</em> (Google Labs), que genera UI completa a partir de prompts usando Gemini. Sin embargo, reseñas independientes de Stitch señalan su principal debilidad: sin reglas de marca deterministas, los colores se desvían de los sistemas de marca y los componentes pierden consistencia. Esta iniciativa toma esa lección: acota el alcance a los <strong>fundamentos</strong> del design system y aplica reglas fijas de derivación de color y contraste.</p>
+
+    <h2 id="arquitectura"><span class="num">03</span>Arquitectura de la solución</h2>
+
+    <h3 id="flujo">2.1 Flujo del usuario</h3>
+    <div class="flow">
+      <div class="flow-step"><span class="dot"></span><span class="txt">Usuario entra a la landing</span></div>
+      <div class="flow-arrow">↓ elige camino de entrada</div>
+      <div class="flow-branches">
+        <div class="flow-step branch"><span class="dot"></span><span class="txt"><b>A) Ya tengo mi marca</b> → ingresa color primario, secundario y fuente</span></div>
+        <div class="flow-step branch"><span class="dot"></span><span class="txt"><b>B) Marca nueva</b> → describe personalidad, industria, público</span></div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><span class="dot"></span><span class="txt">Elige un preset de forma — <b>Sharp / Soft / Rounded / Full Round</b></span></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><span class="dot"></span><span class="txt">Presiona <b>«Generar»</b></span></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><span class="dot"></span><span class="txt">Loading — llamada a Gemini API</span></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><span class="dot"></span><span class="txt"><b>Resultado:</b> preview del design system — paleta con roles, escala tipográfica, componentes (botón, input, card, badge), vista responsive mobile/desktop</span></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><span class="dot"></span><span class="txt">Usuario exporta tokens (JSON W3C DTCG) → import a Figma</span></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step"><span class="dot"></span><span class="txt">Se guarda el proyecto en historial (PostgreSQL)</span></div>
+    </div>
+
+    <p style="font-size:.9rem;color:var(--muted)">Vista previa ilustrativa del resultado que produce el flujo — paleta derivada, escala tipográfica y componentes base con el preset de radius aplicado:</p>
+    <div class="dsp">
+      <div class="dsp-head">Preview generado · preset "Soft"</div>
+      <div class="dsp-body">
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:#2a4d3e"></div><div class="lbl">primary</div></div>
+          <div class="swatch"><div class="chip" style="background:#f2f7f2;border-color:#d8d4c8"></div><div class="lbl">on-primary</div></div>
+          <div class="swatch"><div class="chip" style="background:#dfeee2"></div><div class="lbl">primary-container</div></div>
+          <div class="swatch"><div class="chip" style="background:#c66a3a"></div><div class="lbl">secondary</div></div>
+          <div class="swatch"><div class="chip" style="background:#2f9e5c"></div><div class="lbl">success</div></div>
+          <div class="swatch"><div class="chip" style="background:#d9a02a"></div><div class="lbl">warning</div></div>
+          <div class="swatch"><div class="chip" style="background:#c0432c"></div><div class="lbl">error</div></div>
+        </div>
+        <div class="comp-row">
+          <span class="btn-demo">Continuar</span>
+          <span class="input-demo">Nombre de marca</span>
+          <div class="comp-card">
+            <div class="cctitle">Card title</div>
+            <div class="ccsub">Texto secundario de ejemplo</div>
+          </div>
+          <span class="badge-demo">Nuevo</span>
+        </div>
+        <div class="radius-row">
+          <span class="radius-pill">button: 8px</span>
+          <span class="radius-pill">card: 14px</span>
+          <span class="radius-pill">input: 8px</span>
+          <span class="radius-pill">badge: full (fijo)</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 id="reglas">2.2 Reglas fijas del sistema</h3>
+    <p>Estas reglas no se le preguntan al usuario, se imponen: van directo en el prompt a Gemini como restricciones, para que el resultado sea predecible y no varíe caóticamente entre generaciones.</p>
+    <ul class="rules">
+      <li><strong>Roles de color:</strong> todo color adicional (on-primary, primary-container, neutros, estados) se <em>deriva</em> del primario/secundario ingresado — nunca se inventa un color nuevo sin relación con la marca.</li>
+      <li><strong>Contraste:</strong> todo par texto/fondo se calcula para cumplir WCAG AA (4.5:1) automáticamente.</li>
+      <li><strong>Badge:</strong> siempre usa <code>radius.full</code> (pill), independientemente del preset elegido.</li>
+      <li><strong>Colores semánticos</strong> (success / warning / error): son fijos por el sistema, no se derivan de la marca, para no comprometer su legibilidad universal.</li>
+      <li><strong>Preset de forma → tokens de radius:</strong> el usuario no fija un número de px, elige una filosofía (Sharp/Soft/Rounded/Full) que mapea a una tabla fija de valores por componente.</li>
+    </ul>
+
+    <h3 id="stack">2.3 Stack</h3>
+    <table>
+      <thead><tr><th>Capa</th><th>Herramienta</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend</td><td>React + Vercel</td></tr>
+        <tr><td>Backend</td><td>Railway (Node/API)</td></tr>
+        <tr><td>IA</td><td>Gemini API — modelo <code>gemini-2.5-flash</code> (capa gratuita, sin billing habilitado). Suficiente para el volumen de un proyecto demo de 30 días; no se usa Pro (de pago desde abril 2026 y con cuota diaria muy limitada).</td></tr>
+        <tr><td>Base de datos</td><td>PostgreSQL (historial de proyectos generados)</td></tr>
+        <tr><td>Control de versiones</td><td>GitHub</td></tr>
+        <tr><td>Export</td><td>JSON compatible con W3C Design Tokens (DTCG) → Figma</td></tr>
+      </tbody>
+    </table>
+
+    <h3 id="datos">2.4 Nota sobre datos</h3>
+    <div class="callout">
+      <p style="margin:0">La capa gratuita de Gemini API puede usar los prompts y respuestas para mejorar los modelos de Google. Dado que esta demo trabaja con descripciones de marca de ejemplo (no datos reales de clientes), esto no representa un riesgo para el alcance del programa.</p>
+    </div>
+
+    <h2 id="criterios"><span class="num">04</span>Criterios de éxito</h2>
+    <ol class="criteria">
+      <li>El usuario puede generar un design system completo (paleta con roles, tipografía, y 4 componentes: botón, input, card, badge) en <strong>menos de 60 segundos</strong> desde que envía el formulario.</li>
+      <li>El JSON de tokens exportado <strong>cumple la estructura W3C DTCG</strong> (<code>$value</code>, <code>$type</code>) y se puede importar en Figma sin errores de validación.</li>
+      <li>El <strong>100% de las combinaciones texto/fondo</strong> generadas cumplen contraste WCAG AA (4.5:1), verificable de forma automática sin ajuste manual.</li>
+      <li>El usuario puede elegir entre <strong>al menos 3 presets de forma</strong> (Sharp / Soft / Rounded) y ver los 4 componentes actualizar su radius en el preview según la tabla fija definida.</li>
+      <li>El preview muestra el sistema generado correctamente en <strong>al menos 2 breakpoints</strong> (mobile y desktop), con los tokens de espaciado y tipografía adaptados a cada uno.</li>
+    </ol>
+
+    <h2 id="referencias"><span class="num">05</span>Referencias</h2>
+    <div class="refs">
+      <ul>
+        <li>Linkup Studio — <a href="https://linkupst.com/blog/design-systems-what-you-need-to-know" target="_blank" rel="noopener">Design Systems: what you need to know</a></li>
+        <li>Lucid UX — <a href="https://medium.com/lucid-software-design/how-we-built-a-design-system-in-3-months-e9fc1f4bae15" target="_blank" rel="noopener">How we built a design system in 3 months</a></li>
+        <li>Lago Blog — <a href="https://getlago.com/blog/how-soon-should-you-have-a-design-system" target="_blank" rel="noopener">How soon should you have a design system</a></li>
+        <li>Google — <a href="https://codelabs.developers.google.com/customizing-material-color" target="_blank" rel="noopener">Material Theme Builder (Codelabs)</a> · <a href="https://github.com/material-foundation/material-theme-builder" target="_blank" rel="noopener">GitHub</a></li>
+        <li>Figma — <a href="https://www.figma.com/solutions/ai-design-systems-generator/" target="_blank" rel="noopener">AI Design Systems Generator</a> · <a href="https://www.figma.com/blog/design-systems-ai-mcp/" target="_blank" rel="noopener">Design Systems and AI: MCP Servers</a></li>
+        <li>W3C Design Tokens Community Group — <a href="https://www.designtokens.org/" target="_blank" rel="noopener">designtokens.org</a> · <a href="https://www.designtokens.org/tr/drafts/format/" target="_blank" rel="noopener">Especificación</a></li>
+        <li>Google Stitch — <a href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-gemini-3/" target="_blank" rel="noopener">Anuncio Gemini 3 en Stitch</a> · <a href="https://uxpilot.ai/blogs/google-stitch-ai" target="_blank" rel="noopener">Reseña independiente</a></li>
+        <li>Google AI for Developers — <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">Pricing</a> · <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener">Billing</a></li>
+      </ul>
+    </div>
+
+    <footer class="doc-footer">Spec preparado para revisión en Sesión 1.1 del Programa AI — DxD.</footer>
+  </main>
+</div>
+</body>
+</html>
