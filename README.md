@@ -23,7 +23,7 @@ Crear un design system inicial toma entre 40 y 50 horas de trabajo manual. Las h
 |------|-------------|
 | Frontend | React + Vercel |
 | Backend | Railway (Node/API) |
-| IA | Gemini API — `gemini-2.5-flash` |
+| IA | Gemini API — `gemini-3.5-flash` |
 | Base de datos | PostgreSQL |
 | Export | JSON W3C DTCG → Figma |
 

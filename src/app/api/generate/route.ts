@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { validateAndFixContrast } from "./colorUtils";
 
 // Fixed shape preset mapping as per requirements
 const SHAPE_PRESETS = {
@@ -101,17 +102,13 @@ export async function POST(req: Request) {
         shapePreset,
         brandDescription
       );
-      return NextResponse.json({ success: true, tokens: mockTokens, isMock: true });
+      const { tokens: validatedTokens, contrastReport } = validateAndFixContrast(mockTokens);
+      return NextResponse.json({ success: true, tokens: validatedTokens, contrastReport, isMock: true });
     }
 
     // Initialize Gemini SDK
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
+    const modelNames = ["gemini-3.5-flash", "gemini-3-flash", "gemini-3.1-flash-lite"];
 
     // Create custom strict prompt
     const prompt = `
@@ -190,8 +187,33 @@ Estructura de salida JSON requerida (sigue exactamente esta estructura y nombres
 Responde única y exclusivamente con el JSON válido. No agregues texto explicativo, prefacios, ni bloques markdown de código.
 `;
 
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    let responseText = "";
+    let lastError: unknown = null;
+
+    for (const modelName of modelNames) {
+      try {
+        console.log(`Intentando generar contenido con el modelo de Gemini: ${modelName}`);
+        const model = genAI.getGenerativeModel({
+          model: modelName,
+          generationConfig: {
+            responseMimeType: "application/json",
+          },
+        });
+        const result = await model.generateContent(prompt);
+        responseText = result.response.text();
+        if (responseText) {
+          console.log(`Modelo exitoso: ${modelName}`);
+          break;
+        }
+      } catch (err: unknown) {
+        console.warn(`El modelo ${modelName} falló:`, err instanceof Error ? err.message : err);
+        lastError = err;
+      }
+    }
+
+    if (!responseText) {
+      throw lastError || new Error("Todos los modelos de la API de Gemini fallaron.");
+    }
 
     let tokens;
     try {
@@ -209,7 +231,8 @@ Responde única y exclusivamente con el JSON válido. No agregues texto explicat
       );
     }
 
-    return NextResponse.json({ success: true, tokens, isMock: false });
+    const { tokens: validatedTokens, contrastReport } = validateAndFixContrast(tokens);
+    return NextResponse.json({ success: true, tokens: validatedTokens, contrastReport, isMock: false });
   } catch (error: unknown) {
     console.error("Error in generate API route:", error);
     const errorMessage = error instanceof Error ? error.message : "Internal server error";

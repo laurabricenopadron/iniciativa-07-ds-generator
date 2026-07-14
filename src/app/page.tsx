@@ -62,6 +62,19 @@ interface DesignSystemTokens {
   radius: RadiusTokens;
 }
 
+interface ContrastReportItem {
+  textColor: string;
+  backgroundColor: string;
+  ratio: string;
+  passed: boolean;
+}
+
+interface ContrastReport {
+  primaryPair: ContrastReportItem;
+  secondaryPair: ContrastReportItem;
+  surfacePair: ContrastReportItem;
+}
+
 export default function Home() {
   // Navigation states: 'input' | 'loading' | 'results' | 'error'
   const [screen, setScreen] = useState<"input" | "loading" | "results" | "error">("input");
@@ -78,6 +91,7 @@ export default function Home() {
 
   // Output design system state
   const [tokens, setTokens] = useState<DesignSystemTokens | null>(null);
+  const [contrastReport, setContrastReport] = useState<ContrastReport | null>(null);
 
   const shapePresets: ShapePreset[] = [
     { id: "sharp", label: "Sharp", radiusClass: "rounded-none", radiusDesc: "0px" },
@@ -117,6 +131,7 @@ export default function Home() {
 
       if (data.success && data.tokens) {
         setTokens(data.tokens);
+        setContrastReport(data.contrastReport || null);
         setIsMock(!!data.isMock);
         setScreen("results");
       } else {
@@ -147,6 +162,7 @@ export default function Home() {
   const handleReset = () => {
     setScreen("input");
     setTokens(null);
+    setContrastReport(null);
   };
 
   // RENDER: Loading screen
@@ -399,6 +415,33 @@ export default function Home() {
                       />
                       <span className="text-[11px] font-bold text-gray-700 truncate">{item.label}</span>
                       <span className="text-[10px] font-mono text-gray-400">{item.token.$value}</span>
+                      
+                      {item.name === "primary" && contrastReport?.primaryPair && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center gap-0.5 bg-[#2F9E5C]/10 text-[#2F9E5C] text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-[#2F9E5C]/20 leading-none">
+                            <span>WCAG AA ✓</span>
+                            <span className="opacity-80 font-semibold font-mono">({contrastReport.primaryPair.ratio})</span>
+                          </span>
+                        </div>
+                      )}
+                      
+                      {item.name === "secondary" && contrastReport?.secondaryPair && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center gap-0.5 bg-[#2F9E5C]/10 text-[#2F9E5C] text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-[#2F9E5C]/20 leading-none">
+                            <span>WCAG AA ✓</span>
+                            <span className="opacity-80 font-semibold font-mono">({contrastReport.secondaryPair.ratio})</span>
+                          </span>
+                        </div>
+                      )}
+                      
+                      {item.name === "surface" && contrastReport?.surfacePair && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center gap-0.5 bg-[#2F9E5C]/10 text-[#2F9E5C] text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-[#2F9E5C]/20 leading-none">
+                            <span>WCAG AA ✓</span>
+                            <span className="opacity-80 font-semibold font-mono">({contrastReport.surfacePair.ratio})</span>
+                          </span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
