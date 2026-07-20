@@ -14,8 +14,8 @@
 |---|---|---|
 | 1 | Descubrir el formato exacto (probar plugins) | ✅ Completo |
 | 2 | Crear las variables en Figma | ✅ Completo (lo hizo el plugin) |
-| 3 | Construir los 4 componentes atados a variables | 🔜 En curso |
-| 4 | Página showcase | ⬜ Pendiente |
+| 3 | Construir los 4 componentes atados a variables | ✅ Completo |
+| 4 | Página showcase | ✅ Completo |
 | 5 | Prueba de fuego end-to-end | ⬜ Pendiente |
 | 6 | Publicar en Figma Community | ⬜ Pendiente |
 | 7 | Documentar el flujo para la demo | ⬜ Pendiente |
@@ -86,32 +86,55 @@ typography/scale/body       typography/scale/label
 ---
 
 ## Paso 3 · Construir los 4 componentes atados a variables
-**Estado:** 🔜 En curso · **Fecha inicio:** —
+**Estado:** ✅ Completo · **Fecha:** 20 de julio 2026
 
-### Plan
-Construir Button, Input, Card y Badge, atando cada propiedad a su variable (sin valores fijos):
+### Qué se hizo
+Se construyeron los 4 componentes desde cero en Figma, atando cada propiedad visual a su variable (ningún valor pintado a mano):
 
-- **Button** — fondo → `color/primary` · texto → `color/on-primary` · radius → `radius/button`
-- **Input** — fondo → `color/surface` · borde → neutro · radius → `radius/input`
-- **Card** — fondo → `color/surface` · título → `color/on-surface` · radius → `radius/card`
-- **Badge** — fondo → `color/secondary` · radius → `radius/badge`
+| Componente | Fondo | Texto | Tamaño texto | Radius |
+|---|---|---|---|---|
+| **Button** | `color/primary` | `color/on-primary` | `typography/scale/body` | `radius/button` |
+| **Input** | `color/surface` | `color/neutral/400` (placeholder) | `typography/scale/body` | `radius/input` |
+| **Card** | `color/surface` | título `color/on-surface` · secundario `color/neutral/500` | título `title` · secundario `body` | `radius/card` |
+| **Badge** | `color/secondary` | `color/on-secondary` | `typography/scale/label` | `radius/badge` (pill 999) |
+
+- Los 4 quedaron convertidos en componentes de Figma (Create component)
+- Input lleva además un **stroke** atado a `color/neutral/300`
+- Card lleva una sombra sutil (Effects, cosmética, no atada a variable)
+
+### Hallazgo clave — la tipografía SÍ se puede atar a variables
+Durante la construcción surgió la duda de si los tamaños de texto podían enchufarse a las variables numéricas (como los colores y el radius). Respuesta: **SÍ se puede**, pero el gesto es distinto:
+
+- No se hace con el iconito de variables al lado del campo (como en fill/radius)
+- Se hace desde la sección **Typography** del panel derecho, con el texto seleccionado como objeto (no en modo edición), abriendo el panel de variables de tamaño de fuente
+- Ahí se elige del grupo `typography/scale/` (display, headline, title, body, label)
+
+**Consecuencia positiva:** el template re-tematiza TODO con el JSON — colores, radius Y tamaños tipográficos. Queda más completo de lo planeado. El único token que no se ata sigue siendo `fontFamily` (el nombre de la fuente), que se maneja aparte con la fuente aplicada directamente.
 
 ### Registro de avance
-*(pendiente de completar a medida que se construye cada componente)*
-
-- [ ] Button
-- [ ] Input
-- [ ] Card
-- [ ] Badge
-- [ ] Convertir cada uno en componente
-- [ ] (Opcional) Variantes: primary/secondary, hover, disabled
+- [x] Button
+- [x] Input
+- [x] Card
+- [x] Badge
+- [x] Convertir cada uno en componente
+- [ ] (Opcional, pendiente) Variantes: primary/secondary, hover, disabled
 
 ---
 
 ## Paso 4 · Página showcase
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Completo · **Fecha:** 20 de julio 2026
 
-*(a completar)*
+### Qué se hizo
+Se armó una página "Foundations/Showcase" que muestra el sistema completo en un solo lugar:
+
+- **Paleta de colores** en swatches, organizada en 3 grupos: Brand (7 roles), Semantic (success/warning/error) y Neutral (100–500). Cada swatch con fill atado a su variable y etiqueta con el nombre.
+- **Escala tipográfica** con los 5 niveles (Display, Headline, Title, Body, Label), cada uno con texto de muestra representativo de su uso y su valor de referencia (56px, 32px, 20px, 16px, 14px). Tamaños atados a las variables `typography/scale/`.
+- **Los 4 componentes** (Button, Input, Card, Badge) colocados como instancias en el canvas.
+
+Esta página es la que va a "cambiar de piel" en vivo durante la demo → el momento wow.
+
+### Pendiente cosmético opcional
+- Agregar un título de sección "Components" arriba del grupo de componentes (para hacer juego con las otras secciones). No bloqueante.
 
 ---
 
@@ -141,3 +164,5 @@ Construir Button, Input, Card y Badge, atando cada propiedad a su variable (sin 
 | Fecha | Actualización |
 |---|---|
 | 20 jul 2026 | Creación del documento. Pasos 1 y 2 registrados como completos. |
+| 20 jul 2026 | Paso 3 completo: 4 componentes construidos y atados a variables. Hallazgo: la tipografía SÍ se puede atar a variables de tamaño. |
+| 20 jul 2026 | Paso 4 completo: página showcase con paleta, escala tipográfica y los 4 componentes. |
