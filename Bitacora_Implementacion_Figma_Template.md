@@ -16,9 +16,10 @@
 | 2 | Crear las variables en Figma | ✅ Completo (lo hizo el plugin) |
 | 3 | Construir los 4 componentes atados a variables | ✅ Completo |
 | 4 | Página showcase | ✅ Completo |
-| 5 | Prueba de fuego end-to-end | ⬜ Pendiente |
-| 6 | Publicar en Figma Community | ⬜ Pendiente |
+| 5 | Prueba de fuego end-to-end | ✅ Completo |
+| 6 | Publicar en Figma Community | 🔜 En curso |
 | 7 | Documentar el flujo para la demo | ⬜ Pendiente |
+| + | Sección de instrucciones dentro de la app (extra) | ✅ Completo |
 
 ---
 
@@ -139,14 +140,26 @@ Esta página es la que va a "cambiar de piel" en vivo durante la demo → el mom
 ---
 
 ## Paso 5 · Prueba de fuego end-to-end
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Completo · **Fecha:** 20 de julio 2026
 
-*(a completar)*
+### Qué se hizo
+Se generaron varias marcas distintas en Design Gen y se importaron sobre el template para validar que todo se re-tematiza solo. Marca de prueba principal: primario terracota `#af360d`, secundario violeta `#65057f`, fuente Plus Jakarta Sans, preset Full Round (button 999, input 16, card 20).
+
+### Resultado
+✅ **FUNCIONA.** Al reimportar, se re-tematizaron solos: paleta completa, los 4 componentes (Button terracota con forma píldora, Badge violeta, Card con esquinas redondeadas), tamaños tipográficos y el showcase entero. Validado con múltiples marcas distintas — no fue casualidad.
+
+### Aprendizajes clave (CRÍTICOS para la demo)
+1. **No borrar las variables antes de reimportar.** Si se borra la colección, los componentes pierden el vínculo y no se re-tematizan. El flujo correcto es reimportar SOBRE la colección existente: el plugin pisa los valores viejos con los nuevos y los componentes (que siguen atados a esas variables) cambian solos.
+2. **El plugin matchea la colección por nombre.** Para que un import actualice la colección existente (en vez de crear una nueva duplicada), el nombre tiene que coincidir. Solución aplicada: renombrar la colección en el panel de variables de Figma para que matchee, y así los imports sucesivos actualizan correctamente.
+3. **El nombre del archivo descargado:** el código de la app (`page.tsx`) ya descarga como `design-tokens.json` (nombre limpio, sin número). El sufijo `(1)(2)(3)` lo agrega el navegador cuando ya existe un archivo con ese nombre en Descargas. Fix de higiene: borrar los JSON viejos de Descargas antes de la demo para que cada descarga salga limpia. No requiere cambio de código.
+
+### Pendiente cosmético detectado
+- En el showcase, los textos de muestra de tipografía (Display, Headline) están atados a `on-primary`, que en marcas con `on-primary` claro quedan poco legibles sobre fondo claro. Conviene atarlos a `on-surface` para que se lean en cualquier marca. No bloqueante.
 
 ---
 
 ## Paso 6 · Publicar en Figma Community
-**Estado:** ⬜ Pendiente
+**Estado:** 🔜 En curso
 
 *(a completar)*
 
@@ -159,6 +172,23 @@ Esta página es la que va a "cambiar de piel" en vivo durante la demo → el mom
 
 ---
 
+## Extra · Sección de instrucciones dentro de la app
+**Estado:** ✅ Completo · **Fecha:** 20 de julio 2026
+
+### Qué se hizo
+Se agregó a la pantalla de resultados de Design Gen (`src/app/page.tsx`) una sección de guía siempre visible, para que el usuario sepa cómo llevar su JSON a Figma sin depender de documentación externa.
+
+- Botón **"Instrucciones"** junto a "Exportar JSON" que hace scroll suave hasta la sección
+- Sección "Cómo llevar tu design system a Figma" con 4 pasos en tarjetas: descargar JSON, abrir template en Community, instalar plugin, importar JSON
+- Recuadro de advertencia (ámbar) sobre el nombre del archivo `design-tokens.json` y el sufijo `(2)` que agrega el navegador
+- Respeta el diseño existente (violeta `#4648D4`, Plus Jakarta Sans, tarjetas con glassmorphism). Implementado con el agente de Antigravity en modo Review; compiló sin errores.
+
+### Pendiente
+- Completar los links `href="#"` del template de Community y del plugin una vez publicado (Paso 6)
+- Ajuste cosmético: pasar los 4 pasos de grid 2×2 a una sola columna (orden 1-2-3-4 vertical) para lectura más fluida
+
+---
+
 ## Registro de cambios del documento
 
 | Fecha | Actualización |
@@ -166,3 +196,5 @@ Esta página es la que va a "cambiar de piel" en vivo durante la demo → el mom
 | 20 jul 2026 | Creación del documento. Pasos 1 y 2 registrados como completos. |
 | 20 jul 2026 | Paso 3 completo: 4 componentes construidos y atados a variables. Hallazgo: la tipografía SÍ se puede atar a variables de tamaño. |
 | 20 jul 2026 | Paso 4 completo: página showcase con paleta, escala tipográfica y los 4 componentes. |
+| 20 jul 2026 | Paso 5 completo: prueba end-to-end exitosa. El template se re-tematiza solo con distintas marcas. Aprendizajes clave sobre el flujo de reimport documentados. |
+| 20 jul 2026 | Extra: sección de instrucciones agregada dentro de la app (pantalla de resultados). Paso 6 marcado en curso. |
