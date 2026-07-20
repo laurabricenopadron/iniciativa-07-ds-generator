@@ -598,7 +598,7 @@ export default function Home() {
 
                 <div>
                   <a
-                    href="#"
+                    href="https://www.figma.com/community/file/1661151496205629619"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#4648D4]/5 hover:bg-[#4648D4]/10 border border-[#4648D4]/20 text-[#4648D4] text-xs font-semibold rounded-xl transition-all"
@@ -629,7 +629,7 @@ export default function Home() {
 
                 <div>
                   <a
-                    href="#"
+                    href="https://www.figma.com/community/plugin/1263743870981744253/design-tokens-manager"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#4648D4]/5 hover:bg-[#4648D4]/10 border border-[#4648D4]/20 text-[#4648D4] text-xs font-semibold rounded-xl transition-all"
