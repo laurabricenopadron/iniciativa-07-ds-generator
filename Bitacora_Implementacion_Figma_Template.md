@@ -17,7 +17,7 @@
 | 3 | Construir los 4 componentes atados a variables | ✅ Completo |
 | 4 | Página showcase | ✅ Completo |
 | 5 | Prueba de fuego end-to-end | ✅ Completo |
-| 6 | Publicar en Figma Community | 🔜 En curso |
+| 6 | Publicar en Figma Community | ✅ Completo |
 | 7 | Documentar el flujo para la demo | ⬜ Pendiente |
 | + | Sección de instrucciones dentro de la app (extra) | ✅ Completo |
 
@@ -159,9 +159,24 @@ Se generaron varias marcas distintas en Design Gen y se importaron sobre el temp
 ---
 
 ## Paso 6 · Publicar en Figma Community
-**Estado:** 🔜 En curso
+**Estado:** ✅ Completo · **Fecha:** 20 de julio 2026
 
-*(a completar)*
+### Qué se hizo
+Se publicó el template en Figma Community como "Design file", categoría Design tools → Import & export. Thumbnail: el frame del showcase (paleta + tipografía + componentes).
+
+- **Link del template publicado:** https://www.figma.com/community/file/1661151496205629619
+- **Plugin de import:** https://www.figma.com/community/plugin/1263743870981744253/design-tokens-manager
+
+### Conexión con la app
+Se completaron los dos links `href="#"` que habían quedado pendientes en la sección de instrucciones de la app (`page.tsx`):
+- Paso 2 "Abrir template en Figma Community" → link del template
+- Paso 3 "Ver plugin" → link del plugin
+
+Ambas piezas (app + template) quedan conectadas: desde la app el usuario llega directo al template y al plugin.
+
+### Aprendizaje
+- Para publicar, el showcase debía estar dentro de un **Frame** (no un Group) para poder usar "Set as thumbnail". Se resolvió con "Frame selection".
+- El template se puede actualizar más adelante con "Publish update" sin romper el link ni afectar copias ya duplicadas por usuarios.
 
 ---
 
@@ -198,3 +213,4 @@ Se agregó a la pantalla de resultados de Design Gen (`src/app/page.tsx`) una se
 | 20 jul 2026 | Paso 4 completo: página showcase con paleta, escala tipográfica y los 4 componentes. |
 | 20 jul 2026 | Paso 5 completo: prueba end-to-end exitosa. El template se re-tematiza solo con distintas marcas. Aprendizajes clave sobre el flujo de reimport documentados. |
 | 20 jul 2026 | Extra: sección de instrucciones agregada dentro de la app (pantalla de resultados). Paso 6 marcado en curso. |
+| 20 jul 2026 | Paso 6 completo: template publicado en Figma Community. Links reales del template y del plugin agregados a la app. App y template conectados. |
