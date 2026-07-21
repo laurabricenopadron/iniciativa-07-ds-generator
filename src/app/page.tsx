@@ -1,6 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+interface SavedProject {
+  id: number;
+  project_name: string;
+  brand_inputs: Record<string, unknown>;
+  tokens: DesignSystemTokens;
+  created_at: string;
+}
 
 interface ShapePreset {
   id: string;
@@ -99,6 +107,31 @@ export default function Home() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveFeedback, setSaveFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  // History projects state
+  const [savedProjects, setSavedProjects] = useState<SavedProject[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(false);
+
+  const fetchProjects = async () => {
+    setIsLoadingProjects(true);
+    try {
+      const res = await fetch("/api/projects");
+      const data = await res.json();
+      if (data.success && Array.isArray(data.projects)) {
+        setSavedProjects(data.projects);
+      }
+    } catch (err) {
+      console.error("Error al obtener el historial de proyectos:", err);
+    } finally {
+      setIsLoadingProjects(false);
+    }
+  };
+
+  useEffect(() => {
+    if (screen === "results") {
+      fetchProjects();
+    }
+  }, [screen]);
+
   const handleSaveProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!saveProjectName.trim() || !tokens) return;
@@ -130,6 +163,7 @@ export default function Home() {
 
       if (data.success) {
         setSaveFeedback({ type: "success", message: "✓ Proyecto guardado" });
+        fetchProjects();
         setTimeout(() => {
           setIsSaveModalOpen(false);
           setSaveProjectName("");
@@ -203,6 +237,19 @@ export default function Home() {
     if (!tokens) return;
     const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
       JSON.stringify(tokens, null, 2)
+    )}`;
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", jsonString);
+    downloadAnchor.setAttribute("download", "design-tokens.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleExportProjectJSON = (projectTokens: DesignSystemTokens) => {
+    if (!projectTokens) return;
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(projectTokens, null, 2)
     )}`;
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", jsonString);
@@ -324,7 +371,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-5 py-2.5 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl transition-all"
+                className="px-4 py-2.5 whitespace-nowrap border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl transition-all"
               >
                 Volver a generar
               </button>
@@ -334,7 +381,7 @@ export default function Home() {
                   setSaveFeedback(null);
                   setIsSaveModalOpen(true);
                 }}
-                className="px-5 py-2.5 border border-[#4648D4]/30 bg-white hover:bg-[#4648D4]/5 text-[#4648D4] text-sm font-semibold rounded-xl transition-all flex items-center gap-2 shadow-sm"
+                className="px-4 py-2.5 whitespace-nowrap border border-[#4648D4]/30 bg-white hover:bg-[#4648D4]/5 text-[#4648D4] text-sm font-semibold rounded-xl transition-all flex items-center gap-2 shadow-sm"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -344,9 +391,21 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => {
+                  document.getElementById("history-section")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="px-4 py-2.5 whitespace-nowrap border border-[#4648D4]/20 bg-[#4648D4]/5 hover:bg-[#4648D4]/10 text-[#4648D4] text-sm font-semibold rounded-xl transition-all flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Historial</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
                   document.getElementById("instructions-section")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="px-5 py-2.5 border border-[#4648D4]/20 bg-[#4648D4]/5 hover:bg-[#4648D4]/10 text-[#4648D4] text-sm font-semibold rounded-xl transition-all flex items-center gap-2"
+                className="px-4 py-2.5 whitespace-nowrap border border-[#4648D4]/20 bg-[#4648D4]/5 hover:bg-[#4648D4]/10 text-[#4648D4] text-sm font-semibold rounded-xl transition-all flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -356,7 +415,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={handleExportJSON}
-                className="px-5 py-2.5 bg-[#4648D4] hover:bg-[#393ab3] text-white text-sm font-semibold rounded-xl shadow-md shadow-[#4648D4]/10 transition-all flex items-center gap-2"
+                className="px-4 py-2.5 whitespace-nowrap bg-[#4648D4] hover:bg-[#393ab3] text-white text-sm font-semibold rounded-xl shadow-md shadow-[#4648D4]/10 transition-all flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -727,6 +786,96 @@ export default function Home() {
 
             </div>
 
+          </div>
+
+          {/* History Section */}
+          <div id="history-section" className="pt-6 border-t border-gray-100 space-y-6">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4648D4]/10 border border-[#4648D4]/20 text-[#4648D4] text-xs font-semibold tracking-wide uppercase mb-2">
+                <span>HISTORIAL DE PROYECTOS</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E1E1E]">
+                Proyectos Guardados
+              </h2>
+              <p className="text-gray-500 text-sm mt-1">
+                Consulta y descarga los sistemas de diseño guardados anteriormente.
+              </p>
+            </div>
+
+            {isLoadingProjects ? (
+              <div className="py-12 text-center text-gray-400 text-sm">
+                Cargando historial de proyectos...
+              </div>
+            ) : savedProjects.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl shadow-slate-200/40 text-center space-y-2">
+                <p className="text-gray-600 text-sm font-medium">Todavía no hay proyectos guardados</p>
+                <p className="text-gray-400 text-xs">Guardá tus sistemas de diseño para verlos aquí.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {savedProjects.map((proj) => {
+                  const projPrimary = proj.tokens?.color?.primary?.$value || "#4648D4";
+                  const projSecondary = proj.tokens?.color?.secondary?.$value || "#10B981";
+                  const projSurface = proj.tokens?.color?.surface?.$value || "#FAFAFE";
+                  const projContainer = proj.tokens?.color?.["primary-container"]?.$value || "#E0E7FF";
+
+                  return (
+                    <div
+                      key={proj.id}
+                      className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between space-y-5"
+                    >
+                      <div className="space-y-3">
+                        <h3 className="text-base font-bold text-[#1E1E1E] truncate">
+                          {proj.project_name}
+                        </h3>
+
+                        {/* Swatches preview */}
+                        <div className="space-y-1">
+                          <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block">
+                            Muestra de colores
+                          </span>
+                          <div className="flex items-center gap-2 pt-1">
+                            <div
+                              className="w-8 h-8 rounded-lg border border-black/5 shadow-sm"
+                              style={{ backgroundColor: projPrimary }}
+                              title={`Primario: ${projPrimary}`}
+                            />
+                            <div
+                              className="w-8 h-8 rounded-lg border border-black/5 shadow-sm"
+                              style={{ backgroundColor: projSecondary }}
+                              title={`Secundario: ${projSecondary}`}
+                            />
+                            <div
+                              className="w-8 h-8 rounded-lg border border-black/5 shadow-sm"
+                              style={{ backgroundColor: projContainer }}
+                              title={`Contenedor Primario: ${projContainer}`}
+                            />
+                            <div
+                              className="w-8 h-8 rounded-lg border border-black/5 shadow-sm"
+                              style={{ backgroundColor: projSurface }}
+                              title={`Superficie: ${projSurface}`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-gray-50">
+                        <button
+                          type="button"
+                          onClick={() => handleExportProjectJSON(proj.tokens)}
+                          className="w-full py-2.5 bg-[#4648D4] hover:bg-[#393ab3] text-white text-xs font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-[#4648D4]/10"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                          <span>Exportar JSON</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
         </div>
