@@ -221,10 +221,13 @@ Se conectó la app con una base de datos PostgreSQL en Railway para persistir lo
 ### Resultado
 ✅ Probado end-to-end en local: se generó un sistema, se guardó con nombre "prueba", y la fila apareció en la tabla de Railway (id 1, con brand_inputs y tokens como JSON). La persistencia funciona.
 
-### Pendientes
-- Cargar `DATABASE_URL` en las variables de entorno de Vercel (para que funcione en producción, no solo en local)
+### Producción (Vercel) — resuelto
+- Se cargó `DATABASE_URL` en las variables de entorno de Vercel y se forzó un redeploy → el guardado funciona en producción.
+- **Bug de caché resuelto:** el historial en producción no mostraba los proyectos nuevos (devolvía `304 Not Modified` / `X-Vercel-Cache: HIT`). La API GET `/api/projects` estaba siendo cacheada por Vercel. Se solucionó forzando la ruta como dinámica: `export const dynamic = "force-dynamic"` y `export const revalidate = 0`. Ahora lee de la base en cada request. Diagnosticado con la pestaña Network del navegador.
+
+### Pendientes / evolución futura
 - Sin login: el historial es global (todos los datos en una tabla, sin separación por usuario). Aceptable para la demo; separación por usuario queda como evolución futura.
-- ✅ HECHO: sección de historial que lista los proyectos guardados en tarjetas (nombre + swatches de colores + botón exportar JSON de cada uno). Se agregó API GET /api/projects que lee de la base. Botón "Historial" en la barra de resultados. Sin fecha ni botón de eliminar (el borrado se hace desde Railway). Se corrigió también el wrap de texto en los botones de la barra.
+- Opcional: refresco automático del historial tras guardar (hoy se actualiza al recargar / volver a entrar a resultados; funciona bien con force-dynamic).
 
 ---
 
@@ -240,3 +243,4 @@ Se conectó la app con una base de datos PostgreSQL en Railway para persistir lo
 | 20 jul 2026 | Paso 6 completo: template publicado en Figma Community. Links reales del template y del plugin agregados a la app. App y template conectados. |
 | 21 jul 2026 | Integración Railway + PostgreSQL: base de datos creada, tabla design_systems, guardado manual de proyectos funcionando end-to-end (probado en local). Spec y guía de terminal actualizados. |
 | 21 jul 2026 | Sección de historial de proyectos guardados: API GET /api/projects, lista en tarjetas con swatches y export por proyecto, botón "Historial". Fix del wrap de texto en los botones de la barra. |
+| 21 jul 2026 | Base de datos en producción: DATABASE_URL cargada en Vercel + redeploy. Bug de caché resuelto (force-dynamic en /api/projects) — el historial ahora trae datos frescos en cada request. Guardar y leer funcionan 100% en producción. |
