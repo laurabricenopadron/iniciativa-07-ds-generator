@@ -93,6 +93,59 @@ export default function Home() {
   const [tokens, setTokens] = useState<DesignSystemTokens | null>(null);
   const [contrastReport, setContrastReport] = useState<ContrastReport | null>(null);
 
+  // Save project modal & status states
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [saveProjectName, setSaveProjectName] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveFeedback, setSaveFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const handleSaveProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!saveProjectName.trim() || !tokens) return;
+
+    setIsSaving(true);
+    setSaveFeedback(null);
+
+    try {
+      const response = await fetch("/api/save-project", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          project_name: saveProjectName,
+          brand_inputs: {
+            tipo: activeTab === "existing" ? "Marca Existente" : "Marca Nueva",
+            primaryColor,
+            secondaryColor,
+            fontFamily: selectedFont,
+            shapePreset,
+            brandDescription,
+          },
+          tokens,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSaveFeedback({ type: "success", message: "✓ Proyecto guardado" });
+        setTimeout(() => {
+          setIsSaveModalOpen(false);
+          setSaveProjectName("");
+        }, 1500);
+      } else {
+        setSaveFeedback({ type: "error", message: data.error || "Error al guardar el proyecto." });
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : "Error al guardar el proyecto.";
+      setSaveFeedback({ type: "error", message: msg });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const shapePresets: ShapePreset[] = [
     { id: "sharp", label: "Sharp", radiusClass: "rounded-none", radiusDesc: "0px" },
     { id: "soft", label: "Soft", radiusClass: "rounded-md", radiusDesc: "6px" },
@@ -274,6 +327,19 @@ export default function Home() {
                 className="px-5 py-2.5 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl transition-all"
               >
                 Volver a generar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSaveFeedback(null);
+                  setIsSaveModalOpen(true);
+                }}
+                className="px-5 py-2.5 border border-[#4648D4]/30 bg-white hover:bg-[#4648D4]/5 text-[#4648D4] text-sm font-semibold rounded-xl transition-all flex items-center gap-2 shadow-sm"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                <span>Guardar proyecto</span>
               </button>
               <button
                 type="button"
@@ -664,6 +730,79 @@ export default function Home() {
           </div>
 
         </div>
+
+        {/* Modal de Guardar Proyecto */}
+        {isSaveModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 space-y-5 relative">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-[#1E1E1E]">Guardar Proyecto</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsSaveModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-all p-1"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveProject} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="project-name-input" className="block text-xs font-bold text-[#1E1E1E] uppercase tracking-wider">
+                    Nombre del Proyecto
+                  </label>
+                  <input
+                    id="project-name-input"
+                    type="text"
+                    required
+                    value={saveProjectName}
+                    onChange={(e) => setSaveProjectName(e.target.value)}
+                    placeholder="Ej: E-commerce Marca Principal..."
+                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/20 focus:border-[#4648D4] transition-all"
+                  />
+                </div>
+
+                {saveFeedback && (
+                  <div
+                    className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
+                      saveFeedback.type === "success"
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : "bg-red-50 text-red-700 border border-red-200"
+                    }`}
+                  >
+                    <span>{saveFeedback.message}</span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsSaveModalOpen(false)}
+                    className="px-4 py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSaving || !saveProjectName.trim()}
+                    className="px-5 py-2.5 bg-[#4648D4] hover:bg-[#393ab3] disabled:opacity-50 text-white text-sm font-semibold rounded-xl shadow-md shadow-[#4648D4]/10 transition-all flex items-center gap-2"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Guardando...</span>
+                      </>
+                    ) : (
+                      <span>Confirmar y Guardar</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     );
   }
