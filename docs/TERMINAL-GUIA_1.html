@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía rápida de Terminal — Mac</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #f7f6f3;
+    --panel: #ffffff;
+    --line: #e2dfda;
+    --muted: #7a756c;
+    --green: #1a7742;
+    --green-light: #e2f2e8;
+    --orange: #c25a1c;
+    --orange-light: #fceee5;
+    --code-bg: #1e1e2e;
+    --code-text: #cdd6f4;
+    --code-green: #a6e3a1;
+    --code-blue: #89b4fa;
+    --code-yellow: #f9e2af;
+    --code-comment: #6c7086;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+
+  ::selection { background: var(--green-light); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  /* --- Sidebar --- */
+  nav.sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 16px 40px 24px;
+    border-right: 1px solid var(--line);
+  }
+  .sidebar-label {
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .sidebar-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 24px;
+    line-height: 1.3;
+  }
+  nav.sidebar ul { list-style: none; }
+  nav.sidebar li { margin-bottom: 1px; }
+  nav.sidebar a {
+    display: block;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+  }
+  nav.sidebar a:hover { background: var(--green-light); color: var(--green); }
+
+  /* --- Main --- */
+  main {
+    padding: 48px 48px 100px;
+    max-width: 780px;
+  }
+
+  header {
+    margin-bottom: 48px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+  }
+  header .eyebrow {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--orange);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  header p { color: var(--muted); font-size: 14.5px; }
+
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--green);
+    margin: 48px 0 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--green-light);
+  }
+
+  h3 {
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 28px 0 8px;
+  }
+
+  p { margin: 10px 0; color: #3a3832; }
+
+  /* --- Code blocks --- */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+    font-size: 13.5px;
+    line-height: 1.65;
+    margin: 12px 0;
+  }
+  pre .cmd { color: var(--code-green); }
+  pre .flag { color: var(--code-blue); }
+  pre .str { color: var(--code-yellow); }
+  pre .comment { color: var(--code-comment); font-style: italic; }
+
+  code {
+    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+    background: #eae7e0;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: .88em;
+    color: #4a3f2f;
+  }
+
+  /* --- Tables --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    background: var(--green);
+    color: #fff;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: 12.5px;
+    letter-spacing: .02em;
+  }
+  th:first-child { border-radius: 8px 0 0 0; }
+  th:last-child { border-radius: 0 8px 0 0; }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: .85em; }
+
+  /* --- Callout --- */
+  .tip {
+    background: var(--green-light);
+    border-left: 4px solid var(--green);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: .93rem;
+  }
+  .tip strong { color: var(--green); }
+
+  .warning {
+    background: var(--orange-light);
+    border-left: 4px solid var(--orange);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: .93rem;
+  }
+  .warning strong { color: var(--orange); }
+
+  /* --- Shortcut keys --- */
+  kbd {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-family: 'SF Mono', monospace;
+    font-size: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+    color: var(--ink);
+  }
+
+  /* --- Errors table --- */
+  .errors td:first-child {
+    color: var(--orange);
+    font-weight: 600;
+    font-size: 13px;
+    width: 40%;
+  }
+
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.sidebar {
+      position: static;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+      padding: 20px;
+    }
+    main { padding: 32px 20px 80px; }
+    h1 { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="sidebar">
+    <div class="sidebar-label">Referencia rápida</div>
+    <div class="sidebar-title">Terminal<br>para Mac</div>
+    <ul>
+      <li><a href="#abrir">Abrir la Terminal</a></li>
+      <li><a href="#navegar">Navegar carpetas</a></li>
+      <li><a href="#archivos">Crear y borrar</a></li>
+      <li><a href="#git">Git — flujo diario</a></li>
+      <li><a href="#commits">Mensajes de commit</a></li>
+      <li><a href="#proyecto">Correr el proyecto</a></li>
+      <li><a href="#atajos">Atajos útiles</a></li>
+      <li><a href="#errores">Si algo sale mal</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <header>
+      <div class="eyebrow">Programa AI · DxD · Baufest</div>
+      <h1>Guía rápida de Terminal</h1>
+      <p>Referencia de los comandos esenciales para navegar carpetas, usar Git y correr el proyecto.</p>
+    </header>
+
+    <!-- ABRIR -->
+    <h2 id="abrir">Abrir la Terminal</h2>
+    <p>La forma más rápida:</p>
+    <pre><span class="comment"># Presionar ⌘ + Espacio → escribir "Terminal" → Enter</span></pre>
+    <div class="tip">
+      <strong>Tip:</strong> podés fijar Terminal en el Dock para tenerla siempre a mano: click derecho sobre el ícono → Opciones → Mantener en el Dock.
+    </div>
+
+    <!-- NAVEGAR -->
+    <h2 id="navegar">Navegar carpetas</h2>
+    <table>
+      <thead><tr><th>Comando</th><th>Qué hace</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td><code>pwd</code></td><td>Muestra dónde estoy</td><td><code>/Users/lbriceno</code></td></tr>
+        <tr><td><code>ls</code></td><td>Lista archivos</td><td></td></tr>
+        <tr><td><code>ls -la</code></td><td>Lista todo (incluye ocultos)</td><td></td></tr>
+        <tr><td><code>cd nombre</code></td><td>Entrar a una carpeta</td><td><code>cd Documents</code></td></tr>
+        <tr><td><code>cd ..</code></td><td>Subir un nivel</td><td></td></tr>
+        <tr><td><code>cd ~</code></td><td>Ir al home</td><td></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Ir directo al proyecto ⭐</h3>
+    <p>El comando que más vas a usar. Copiá y pegá esto tal cual para entrar a la carpeta del proyecto:</p>
+    <pre><span class="cmd">cd</span> <span class="str">"Documents/proyecto 07/iniciativa-07-ds-generator"</span></pre>
+
+    <div class="tip">
+      <strong>Flujo completo desde cero</strong> (abrir terminal y llegar al proyecto):<br><br>
+      1. <kbd>⌘</kbd> + <kbd>Espacio</kbd> → escribir "Terminal" → Enter<br>
+      2. Pegar: <code>cd "Documents/proyecto 07/iniciativa-07-ds-generator"</code><br>
+      3. Verificar que llegaste bien: <code>pwd</code> (tiene que terminar en <code>iniciativa-07-ds-generator</code>)
+    </div>
+
+    <div class="tip">
+      <strong>Truco anti-errores:</strong> si no te acordás la ruta, escribí <code>cd</code> y un espacio, y después <strong>arrastrá la carpeta del proyecto desde el Finder</strong> hasta la ventana de Terminal. La ruta se completa sola. Enter y listo.
+    </div>
+
+    <div class="warning">
+      <strong>Ojo con los espacios:</strong> como la carpeta se llama "proyecto 07" (con espacio), la ruta <strong>siempre va entre comillas</strong>: <code>cd "Documents/proyecto 07/..."</code>. Sin las comillas, la terminal se confunde con el espacio y da error.
+    </div>
+
+    <!-- CREAR Y BORRAR -->
+    <h2 id="archivos">Crear y borrar</h2>
+    <table>
+      <thead><tr><th>Comando</th><th>Qué hace</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td><code>mkdir nombre</code></td><td>Crear carpeta</td><td><code>mkdir components</code></td></tr>
+        <tr><td><code>touch archivo</code></td><td>Crear archivo vacío</td><td><code>touch index.html</code></td></tr>
+        <tr><td><code>rm archivo</code></td><td>Borrar archivo</td><td><code>rm viejo.txt</code></td></tr>
+        <tr><td><code>rm -r carpeta</code></td><td>Borrar carpeta y todo adentro</td><td><code>rm -r borrame</code></td></tr>
+        <tr><td><code>cp origen destino</code></td><td>Copiar</td><td><code>cp spec.html backup.html</code></td></tr>
+        <tr><td><code>mv origen destino</code></td><td>Mover o renombrar</td><td><code>mv viejo.md nuevo.md</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="warning">
+      <strong>Cuidado:</strong> <code>rm</code> borra permanentemente — no va a la papelera. Siempre verificá que estés borrando lo correcto.
+    </div>
+
+    <!-- GIT -->
+    <h2 id="git">Git — flujo diario</h2>
+
+    <h3>Antes de empezar a trabajar</h3>
+    <pre><span class="cmd">git</span> <span class="flag">pull</span>                     <span class="comment"># Trae los últimos cambios de GitHub</span></pre>
+
+    <h3>Después de trabajar</h3>
+    <pre><span class="cmd">git</span> <span class="flag">add</span> .                    <span class="comment"># Prepara todos los archivos cambiados</span>
+<span class="cmd">git</span> <span class="flag">commit</span> <span class="flag">-m</span> <span class="str">"feat: lo que hice"</span>  <span class="comment"># Saca la foto con mensaje</span>
+<span class="cmd">git</span> <span class="flag">push</span>                    <span class="comment"># Sube a GitHub</span></pre>
+
+    <h3>Ver qué cambié</h3>
+    <pre><span class="cmd">git</span> <span class="flag">status</span>                  <span class="comment"># Muestra archivos modificados, nuevos o eliminados</span></pre>
+
+    <h3>Ver historial</h3>
+    <pre><span class="cmd">git</span> <span class="flag">log</span> <span class="flag">--oneline</span>            <span class="comment"># Lista de commits resumida</span></pre>
+
+    <div class="tip">
+      <strong>Recordá:</strong> en Antigravity también podés hacer todo esto visualmente desde el panel de Source Control, sin usar terminal.
+    </div>
+
+    <!-- COMMITS -->
+    <h2 id="commits">Mensajes de commit</h2>
+    <p>Usá un prefijo para que el historial sea fácil de leer:</p>
+    <table>
+      <thead><tr><th>Prefijo</th><th>Cuándo usarlo</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td><code>feat:</code></td><td>Funcionalidad nueva</td><td><code>feat: add brand input form</code></td></tr>
+        <tr><td><code>fix:</code></td><td>Corregir un error</td><td><code>fix: contrast calculation</code></td></tr>
+        <tr><td><code>docs:</code></td><td>Documentación</td><td><code>docs: update README</code></td></tr>
+        <tr><td><code>style:</code></td><td>Cambios visuales (CSS)</td><td><code>style: update color palette</code></td></tr>
+        <tr><td><code>chore:</code></td><td>Mantenimiento / limpieza</td><td><code>chore: add gitignore</code></td></tr>
+        <tr><td><code>refactor:</code></td><td>Reorganizar sin cambiar funcionalidad</td><td><code>refactor: split components</code></td></tr>
+      </tbody>
+    </table>
+
+    <!-- PROYECTO -->
+    <h2 id="proyecto">Correr el proyecto</h2>
+    <pre><span class="cmd">npm</span> <span class="flag">install</span>                 <span class="comment"># Instala dependencias (primera vez o al agregar nuevas)</span>
+<span class="cmd">npm</span> <span class="flag">run</span> dev                 <span class="comment"># Arranca el servidor de desarrollo</span></pre>
+    <p>Después abrir <code>http://localhost:3000</code> en Chrome.</p>
+    <p>Para frenar el servidor: <kbd>Ctrl</kbd> + <kbd>C</kbd></p>
+
+    <!-- ATAJOS -->
+    <h2 id="atajos">Atajos útiles</h2>
+    <table>
+      <thead><tr><th>Atajo</th><th>Qué hace</th></tr></thead>
+      <tbody>
+        <tr><td><kbd>Tab</kbd></td><td>Autocompleta nombres de carpetas y archivos</td></tr>
+        <tr><td><kbd>↑</kbd></td><td>Repite el último comando</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd></td><td>Cancela lo que esté corriendo</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + <kbd>L</kbd></td><td>Limpia la pantalla</td></tr>
+        <tr><td><kbd>⌘</kbd> + <kbd>T</kbd></td><td>Nueva pestaña en Terminal</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ERRORES -->
+    <h2 id="errores">Si algo sale mal</h2>
+    <table class="errors">
+      <thead><tr><th>Problema</th><th>Solución</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>"fatal: not a git repository"</td>
+          <td>No estás en la carpeta del proyecto. Navegá con <code>cd</code> hasta <code>iniciativa-07-ds-generator</code></td>
+        </tr>
+        <tr>
+          <td>"error: failed to push"</td>
+          <td>Hacé <code>git pull</code> primero y después <code>git push</code></td>
+        </tr>
+        <tr>
+          <td>"permission denied"</td>
+          <td>Agregá <code>sudo</code> adelante del comando (te pide contraseña de la Mac)</td>
+        </tr>
+        <tr>
+          <td>Me perdí, no sé dónde estoy</td>
+          <td><code>pwd</code> para ver dónde estás, <code>cd ~</code> para volver al home</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <footer>Guía de referencia — Iniciativa 07 · Programa AI — DxD · Baufest</footer>
+  </main>
+</div>
+</body>
+</html>

@@ -431,30 +431,32 @@
     <ul>
       <li><a href="#problem-corta">Problem statement (corta)</a></li>
       <li><a href="#problem-extendida">Problem statement (extendida)</a></li>
+      <li><a href="#producto">El producto: dos piezas</a></li>
       <li><a href="#arquitectura">Arquitectura de la solución</a></li>
       <li><a href="#flujo">2.1 Flujo del usuario</a></li>
       <li><a href="#reglas">2.2 Reglas fijas</a></li>
-      <li><a href="#stack">2.3 Stack</a></li>
-      <li><a href="#datos">2.4 Nota sobre datos</a></li>
+      <li><a href="#figma">2.3 Export a Figma</a></li>
+      <li><a href="#stack">2.4 Stack</a></li>
+      <li><a href="#datos">2.5 Nota sobre datos</a></li>
       <li><a href="#criterios">3. Criterios de éxito</a></li>
       <li><a href="#referencias">Referencias</a></li>
     </ul>
     <div class="status">
       <strong>Estado del documento</strong>
-      Para revisión — Sesión 1.1
+      Actualizado — post Revisión 1.3 · 21 jul 2026
     </div>
   </nav>
 
   <main>
     <header class="hero">
-      <div class="eyebrow">Spec técnica · Autor: Laura</div>
+      <div class="eyebrow">Spec técnica · Autora: Laura Briceño Padrón</div>
       <h1>Generador de Design Systems con IA</h1>
-      <p class="lead">A partir de la paleta y tipografía de una marca, la herramienta genera automáticamente un sistema de diseño completo — con reglas fijas de contraste y derivación de color — listo para exportar a Figma.</p>
+      <p class="lead">A partir de la paleta y tipografía de una marca, la herramienta genera automáticamente un sistema de diseño completo — con reglas fijas de contraste y derivación de color — que se materializa en componentes reales dentro de Figma mediante un template publicado en la Community.</p>
       <div class="meta-row">
         <span><b>Programa:</b> AI — DxD</span>
         <span><b>Empresa:</b> Baufest</span>
-        <span><b>Estado:</b> Para revisión</span>
-        <span><b>Sesión:</b> 1.1</span>
+        <span><b>Estado:</b> En construcción avanzada</span>
+        <span><b>Actualizado:</b> 21 jul 2026</span>
       </div>
     </header>
 
@@ -479,7 +481,19 @@
     <h3>Validación de mercado</h3>
     <p>Este no es un problema teórico. Google ya invierte en la misma dirección con <em>Stitch</em> (Google Labs), que genera UI completa a partir de prompts usando Gemini. Sin embargo, reseñas independientes de Stitch señalan su principal debilidad: sin reglas de marca deterministas, los colores se desvían de los sistemas de marca y los componentes pierden consistencia. Esta iniciativa toma esa lección: acota el alcance a los <strong>fundamentos</strong> del design system y aplica reglas fijas de derivación de color y contraste.</p>
 
-    <h2 id="arquitectura"><span class="num">03</span>Arquitectura de la solución</h2>
+    <h2 id="producto"><span class="num">03</span>El producto: dos piezas que trabajan juntas</h2>
+    <p>El entregable de esta iniciativa no es una sola aplicación, sino <strong>dos piezas que funcionan en conjunto</strong>. Esta es la evolución clave del proyecto respecto al planteo inicial, validada en la Revisión 1.3.</p>
+    <ul class="rules">
+      <li><strong>Pieza 1 — Design Gen (la app web):</strong> genera las <em>decisiones de diseño</em> con IA (paleta con roles, contraste, escala tipográfica, radius por componente) y las exporta como JSON de tokens en formato W3C DTCG.</li>
+      <li><strong>Pieza 2 — Template de Figma Community:</strong> un archivo publicado con los 4 componentes (button, input, card, badge) ya construidos y con cada propiedad vinculada a variables de Figma. Al importar el JSON generado, las variables se actualizan y todos los componentes se re-tematizan solos con la marca.</li>
+    </ul>
+    <div class="callout short">
+      <div class="eyebrow-small">Por qué dos piezas</div>
+      <p style="margin:0">La IA genera las <strong>decisiones</strong> (qué colores, qué contraste, qué radius); Figma las <strong>materializa</strong> en componentes nativos. Es el mismo patrón que usa Material Theme Builder de Google: se generan los tokens, y los componentes del template se adaptan. Así, los componentes generados por la IA <strong>terminan existiendo como componentes reales en Figma</strong>, adaptados a la marca — cumpliendo la meta de la iniciativa de forma usable y distribuible.</p>
+    </div>
+    <p>El template se publicó en Figma Community, de modo que cualquier diseñador puede duplicarlo con un click e importar su propio JSON. El JSON se importa con el plugin gratuito <strong>Design Tokens Manager</strong>, que lee el formato W3C DTCG sin necesidad de ajustes.</p>
+
+    <h2 id="arquitectura"><span class="num">04</span>Arquitectura de la solución</h2>
 
     <h3 id="flujo">2.1 Flujo del usuario</h3>
     <div class="flow">
@@ -496,11 +510,17 @@
       <div class="flow-arrow">↓</div>
       <div class="flow-step"><span class="dot"></span><span class="txt">Loading — llamada a Gemini API</span></div>
       <div class="flow-arrow">↓</div>
-      <div class="flow-step"><span class="dot"></span><span class="txt"><b>Resultado:</b> preview del design system — paleta con roles, escala tipográfica, componentes (botón, input, card, badge), vista responsive mobile/desktop</span></div>
+      <div class="flow-step"><span class="dot"></span><span class="txt"><b>Resultado:</b> preview del design system — paleta con roles, escala tipográfica, componentes (botón, input, card, badge), reporte de contraste WCAG AA, y una sección de instrucciones siempre visible para llevar el sistema a Figma</span></div>
       <div class="flow-arrow">↓</div>
-      <div class="flow-step"><span class="dot"></span><span class="txt">Usuario exporta tokens (JSON W3C DTCG) → import a Figma</span></div>
+      <div class="flow-step"><span class="dot"></span><span class="txt">Usuario exporta los tokens como JSON (formato W3C DTCG)</span></div>
+      <div class="flow-arrow">↓ el flujo continúa en Figma (Pieza 2)</div>
+      <div class="flow-branches">
+        <div class="flow-step branch"><span class="dot"></span><span class="txt">Duplica el <b>template de Figma Community</b></span></div>
+        <div class="flow-step branch"><span class="dot"></span><span class="txt">Importa el JSON con el plugin <b>Design Tokens Manager</b></span></div>
+        <div class="flow-step branch"><span class="dot"></span><span class="txt">Los 4 componentes + paleta + tipografía <b>se re-tematizan solos</b> con su marca</span></div>
+      </div>
       <div class="flow-arrow">↓</div>
-      <div class="flow-step"><span class="dot"></span><span class="txt">Se guarda el proyecto en historial (PostgreSQL)</span></div>
+      <div class="flow-step"><span class="dot"></span><span class="txt">Se guarda el proyecto en el historial (PostgreSQL en Railway)</span></div>
     </div>
 
     <p style="font-size:.9rem;color:var(--muted)">Vista previa ilustrativa del resultado que produce el flujo — paleta derivada, escala tipográfica y componentes base con el preset de radius aplicado:</p>
@@ -544,34 +564,49 @@
       <li><strong>Preset de forma → tokens de radius:</strong> el usuario no fija un número de px, elige una filosofía (Sharp/Soft/Rounded/Full) que mapea a una tabla fija de valores por componente.</li>
     </ul>
 
-    <h3 id="stack">2.3 Stack</h3>
+    <h3 id="figma">2.3 Export a Figma — cómo se materializa</h3>
+    <p>El JSON generado por la app se convierte en un design system real dentro de Figma a través del template de Community. El mecanismo:</p>
+    <ul class="rules">
+      <li><strong>Variables como puente:</strong> el template tiene una colección de variables de Figma (color, radius y tamaños tipográficos) cuyos nombres coinciden 1 a 1 con la estructura del JSON (<code>color/primary</code>, <code>radius/button</code>, <code>typography/scale/body</code>, etc.).</li>
+      <li><strong>Componentes atados a variables:</strong> los 4 componentes no tienen valores fijos — cada fill, radius y tamaño de texto está vinculado a su variable. Ningún valor "pintado a mano".</li>
+      <li><strong>Re-tematización automática:</strong> al importar el JSON con el plugin Design Tokens Manager (sobre la colección existente, sin borrarla), las variables se actualizan y los componentes cambian solos. Validado con múltiples marcas distintas.</li>
+      <li><strong>Formato sin fricción:</strong> el plugin lee el W3C DTCG (<code>$value</code>, <code>$type</code>) y convierte las dimensiones string (<code>"6px"</code>) en variables numéricas correctas — el JSON no requiere cambios.</li>
+      <li><strong>Guía integrada en la app:</strong> la pantalla de resultados incluye una sección de instrucciones con los links directos al template y al plugin, para que el usuario complete el flujo sin documentación externa.</li>
+    </ul>
+    <p>Esta elección de formato está validada por el mercado: Figma anunció soporte nativo de import/export de variables en formato W3C DTCG (en rollout hacia fin de 2026). <strong>El formato elegido es el que Figma mismo está adoptando como estándar.</strong></p>
+
+    <h3 id="stack">2.4 Stack</h3>
     <table>
       <thead><tr><th>Capa</th><th>Herramienta</th></tr></thead>
       <tbody>
-        <tr><td>Frontend</td><td>React + Vercel</td></tr>
-        <tr><td>Backend</td><td>Railway (Node/API)</td></tr>
-        <tr><td>IA</td><td>Gemini API — modelo <code>gemini-3.5-flash</code> (capa gratuita, sin billing habilitado). Suficiente para el volumen de un proyecto demo de 30 días; no se usa Pro (de pago desde abril 2026 y con cuota diaria muy limitada).</td></tr>
-        <tr><td>Base de datos</td><td>PostgreSQL (historial de proyectos generados)</td></tr>
-        <tr><td>Control de versiones</td><td>GitHub</td></tr>
-        <tr><td>Export</td><td>JSON compatible con W3C Design Tokens (DTCG) → Figma</td></tr>
+        <tr><td>Frontend</td><td>Next.js 14 + React + Tailwind CSS → Vercel (deploy automático en cada push)</td></tr>
+        <tr><td>Backend / API</td><td>Next.js API Routes (<code>/api/generate</code>)</td></tr>
+        <tr><td>IA</td><td>Gemini API — cadena de fallback <code>gemini-3.5-flash</code> → <code>gemini-3-flash</code> → <code>gemini-3.1-flash-lite</code> (capa gratuita, sin billing). Con mock fallback local si no hay API key.</td></tr>
+        <tr><td>Base de datos</td><td>PostgreSQL en Railway (historial de proyectos generados)</td></tr>
+        <tr><td>Control de versiones</td><td>GitHub (Conventional Commits)</td></tr>
+        <tr><td>Export a Figma</td><td>JSON W3C DTCG + template de Figma Community + plugin Design Tokens Manager</td></tr>
       </tbody>
     </table>
 
-    <h3 id="datos">2.4 Nota sobre datos</h3>
+    <h3 id="datos">2.5 Nota sobre datos</h3>
     <div class="callout">
       <p style="margin:0">La capa gratuita de Gemini API puede usar los prompts y respuestas para mejorar los modelos de Google. Dado que esta demo trabaja con descripciones de marca de ejemplo (no datos reales de clientes), esto no representa un riesgo para el alcance del programa.</p>
     </div>
 
-    <h2 id="criterios"><span class="num">04</span>Criterios de éxito</h2>
+    <h2 id="criterios"><span class="num">05</span>Criterios de éxito</h2>
     <ol class="criteria">
-      <li>El usuario puede generar un design system completo (paleta con roles, tipografía, y 4 componentes: botón, input, card, badge) en <strong>menos de 60 segundos</strong> desde que envía el formulario.</li>
-      <li>El JSON de tokens exportado <strong>cumple la estructura W3C DTCG</strong> (<code>$value</code>, <code>$type</code>) y se puede importar en Figma sin errores de validación.</li>
-      <li>El <strong>100% de las combinaciones texto/fondo</strong> generadas cumplen contraste WCAG AA (4.5:1), verificable de forma automática sin ajuste manual.</li>
-      <li>El usuario puede elegir entre <strong>al menos 3 presets de forma</strong> (Sharp / Soft / Rounded) y ver los 4 componentes actualizar su radius en el preview según la tabla fija definida.</li>
-      <li>El preview muestra el sistema generado correctamente en <strong>al menos 2 breakpoints</strong> (mobile y desktop), con los tokens de espaciado y tipografía adaptados a cada uno.</li>
+      <li><strong>✅ Cumplido.</strong> El usuario puede generar un design system completo (paleta con roles, tipografía, y 4 componentes: botón, input, card, badge) en <strong>menos de 60 segundos</strong> desde que envía el formulario.</li>
+      <li><strong>✅ Cumplido.</strong> El JSON de tokens exportado <strong>cumple la estructura W3C DTCG</strong> (<code>$value</code>, <code>$type</code>) y se importa en Figma sin errores — validado con el plugin Design Tokens Manager sobre el template de Community, re-tematizando los componentes con múltiples marcas.</li>
+      <li><strong>✅ Cumplido.</strong> El <strong>100% de las combinaciones texto/fondo</strong> generadas cumplen contraste WCAG AA (4.5:1), verificable de forma automática sin ajuste manual (función <code>validateAndFixContrast</code>).</li>
+      <li><strong>✅ Cumplido.</strong> El usuario puede elegir entre <strong>4 presets de forma</strong> (Sharp / Soft / Rounded / Full Round) y ver los 4 componentes actualizar su radius en el preview según la tabla fija definida.</li>
+      <li><strong>🔜 En curso.</strong> El preview muestra el sistema generado correctamente en <strong>al menos 2 breakpoints</strong> (mobile y desktop), con los tokens de espaciado y tipografía adaptados a cada uno.</li>
     </ol>
+    <div class="callout short">
+      <div class="eyebrow-small">Alcance en implementación</div>
+      <p style="margin:0">Persistencia del historial de proyectos generados con <strong>PostgreSQL en Railway</strong>, integrando la base de datos al flujo para guardar y recuperar sistemas generados.</p>
+    </div>
 
-    <h2 id="referencias"><span class="num">05</span>Referencias</h2>
+    <h2 id="referencias"><span class="num">06</span>Referencias</h2>
     <div class="refs">
       <ul>
         <li>Linkup Studio — <a href="https://linkupst.com/blog/design-systems-what-you-need-to-know" target="_blank" rel="noopener">Design Systems: what you need to know</a></li>
@@ -580,12 +615,13 @@
         <li>Google — <a href="https://codelabs.developers.google.com/customizing-material-color" target="_blank" rel="noopener">Material Theme Builder (Codelabs)</a> · <a href="https://github.com/material-foundation/material-theme-builder" target="_blank" rel="noopener">GitHub</a></li>
         <li>Figma — <a href="https://www.figma.com/solutions/ai-design-systems-generator/" target="_blank" rel="noopener">AI Design Systems Generator</a> · <a href="https://www.figma.com/blog/design-systems-ai-mcp/" target="_blank" rel="noopener">Design Systems and AI: MCP Servers</a></li>
         <li>W3C Design Tokens Community Group — <a href="https://www.designtokens.org/" target="_blank" rel="noopener">designtokens.org</a> · <a href="https://www.designtokens.org/tr/drafts/format/" target="_blank" rel="noopener">Especificación</a></li>
+        <li>Entregables del proyecto — <a href="https://www.figma.com/community/file/1661151496205629619" target="_blank" rel="noopener">Template en Figma Community</a> · <a href="https://www.figma.com/community/plugin/1263743870981744253/design-tokens-manager" target="_blank" rel="noopener">Plugin Design Tokens Manager</a> · <a href="https://iniciativa-07-ds-generator.vercel.app/" target="_blank" rel="noopener">App en producción</a></li>
         <li>Google Stitch — <a href="https://blog.google/innovation-and-ai/models-and-research/google-labs/stitch-gemini-3/" target="_blank" rel="noopener">Anuncio Gemini 3 en Stitch</a> · <a href="https://uxpilot.ai/blogs/google-stitch-ai" target="_blank" rel="noopener">Reseña independiente</a></li>
         <li>Google AI for Developers — <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">Pricing</a> · <a href="https://ai.google.dev/gemini-api/docs/billing" target="_blank" rel="noopener">Billing</a></li>
       </ul>
     </div>
 
-    <footer class="doc-footer">Spec preparado para revisión en Sesión 1.1 del Programa AI — DxD.</footer>
+    <footer class="doc-footer">Spec actualizado el 21 de julio de 2026, reflejando la evolución del proyecto tras la Revisión 1.3 — modelo de dos piezas (app + template de Figma Community) y export a Figma validado. Documento vivo del Programa AI — DxD.</footer>
   </main>
 </div>
 </body>
