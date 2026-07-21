@@ -20,6 +20,7 @@
 | 6 | Publicar en Figma Community | ✅ Completo |
 | 7 | Documentar el flujo para la demo | ⬜ Pendiente |
 | + | Sección de instrucciones dentro de la app (extra) | ✅ Completo |
+| + | Integración Railway + PostgreSQL (guardado de proyectos) | ✅ Completo |
 
 ---
 
@@ -204,6 +205,29 @@ Se agregó a la pantalla de resultados de Design Gen (`src/app/page.tsx`) una se
 
 ---
 
+## Extra · Integración Railway + PostgreSQL
+**Estado:** ✅ Completo (guardado) · **Fecha:** 21 de julio 2026
+
+### Qué se hizo
+Se conectó la app con una base de datos PostgreSQL en Railway para persistir los design systems generados (guardado manual con nombre puesto por el usuario).
+
+- **Base de datos:** PostgreSQL en Railway (plan de prueba, crédito $5). Estado Online.
+- **Tabla `design_systems`:** una sola tabla con `id` (serial), `created_at` (timestamp automático), `project_name` (text), `brand_inputs` (JSONB), `tokens` (JSONB).
+- **Decisión de arquitectura clave:** `brand_inputs` y `tokens` se guardan como bloques JSONB completos, NO en columnas separadas. Así, cuando la app crezca (más componentes, colores, fuentes), la tabla NO necesita cambiar.
+- **Conexión:** `src/lib/db.ts` con connection pool de la librería `pg` y SSL (`rejectUnauthorized: false`, requerido por Railway para conexión externa). La `DATABASE_URL` va en `.env.local` (protegida por `.gitignore`) y deberá cargarse también en Vercel.
+- **API route:** `src/app/api/save-project/route.ts` — recibe POST con nombre + inputs + tokens, valida, e inserta con query parametrizada (`$1, $2, $3`).
+- **UI:** botón "Guardar proyecto" en la pantalla de resultados → modal para nombrar → POST → mensaje de confirmación.
+
+### Resultado
+✅ Probado end-to-end en local: se generó un sistema, se guardó con nombre "prueba", y la fila apareció en la tabla de Railway (id 1, con brand_inputs y tokens como JSON). La persistencia funciona.
+
+### Pendientes
+- Cargar `DATABASE_URL` en las variables de entorno de Vercel (para que funcione en producción, no solo en local)
+- Sin login: el historial es global (todos los datos en una tabla, sin separación por usuario). Aceptable para la demo; separación por usuario queda como evolución futura.
+- Pantalla/sección de historial para listar y reabrir proyectos guardados (siguiente paso, si hay tiempo)
+
+---
+
 ## Registro de cambios del documento
 
 | Fecha | Actualización |
@@ -214,3 +238,4 @@ Se agregó a la pantalla de resultados de Design Gen (`src/app/page.tsx`) una se
 | 20 jul 2026 | Paso 5 completo: prueba end-to-end exitosa. El template se re-tematiza solo con distintas marcas. Aprendizajes clave sobre el flujo de reimport documentados. |
 | 20 jul 2026 | Extra: sección de instrucciones agregada dentro de la app (pantalla de resultados). Paso 6 marcado en curso. |
 | 20 jul 2026 | Paso 6 completo: template publicado en Figma Community. Links reales del template y del plugin agregados a la app. App y template conectados. |
+| 21 jul 2026 | Integración Railway + PostgreSQL: base de datos creada, tabla design_systems, guardado manual de proyectos funcionando end-to-end (probado en local). Spec y guía de terminal actualizados. |
