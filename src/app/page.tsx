@@ -745,7 +745,7 @@ export default function Home() {
                 Cómo llevar tu design system a Figma
               </h2>
               <p className="text-gray-500 text-sm mt-1">
-                Seguí estos 4 pasos para que tus componentes se creen en Figma con tu marca aplicada.
+                Seguí estos 5 pasos para que tus componentes se creen en Figma con tu marca aplicada.
               </p>
             </div>
 
@@ -855,6 +855,33 @@ export default function Home() {
                   <p className="text-sm text-gray-600 leading-relaxed">
                     Abrí el plugin → pestaña Import → JSON Files → cargá tu archivo. Los componentes del template se re-tematizan solos con tu marca.
                   </p>
+                </div>
+              </div>
+              {/* PASO 5 */}
+              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#4648D4] text-white font-extrabold text-sm flex items-center justify-center shrink-0">
+                      5
+                    </div>
+                    <h3 className="text-base font-bold text-[#1E1E1E]">
+                      Aplicá la tipografía
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Seleccioná todos los textos del template (<strong>Cmd + A</strong>) y cambiá la fuente a{" "}
+                    <strong className="text-[#4648D4]">{tokens.typography.fontFamily.$value}</strong>.
+                    Los tamaños ya se ajustan solos con el import.
+                  </p>
+                </div>
+
+                <div className="bg-blue-50/80 border border-blue-200/60 rounded-xl p-3.5 flex items-start gap-3 text-xs text-blue-900 leading-relaxed">
+                  <svg className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <strong>¿Por qué este paso es manual?</strong> Figma todavía no permite vincular el nombre de la fuente a una variable. Los colores, bordes y tamaños se actualizan solos, pero la fuente requiere este único paso extra. Todas las fuentes de Design Gen están disponibles en Figma sin instalar nada.
+                  </div>
                 </div>
               </div>
 
