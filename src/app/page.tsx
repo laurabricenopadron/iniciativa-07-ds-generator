@@ -267,13 +267,6 @@ export default function Home() {
     { id: "full", label: "Full Round", radiusClass: "rounded-full", radiusDesc: "Pill" },
   ];
 
-  const fontVariableMap: Record<string, string> = {
-    "Plus Jakarta Sans": "font-sans",
-    "Inter": "font-inter",
-    "Poppins": "font-poppins",
-    "DM Sans": "font-dmSans",
-  };
-
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
     setScreen("loading");
@@ -404,7 +397,8 @@ export default function Home() {
 
   // RENDER: Results screen
   if (screen === "results" && tokens) {
-    const fontClass = fontVariableMap[tokens.typography.fontFamily.$value] || "font-sans";
+    const resultFontFamily = tokens.typography.fontFamily.$value;
+    loadGoogleFont(resultFontFamily);
 
     const semanticColors = [
       { name: "primary", token: tokens.color.primary, label: "Color Primario" },
@@ -515,7 +509,7 @@ export default function Home() {
                 <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-6">Vista Previa de Componentes</h2>
 
                 {/* Embedded preview using the typography font class */}
-                <div className={`${fontClass} space-y-8`}>
+                <div className="space-y-8" style={{ fontFamily: resultFontFamily }}>
 
                   {/* Button Preview */}
                   <div className="space-y-2">
@@ -689,7 +683,7 @@ export default function Home() {
                   <p className="text-xs text-gray-500 mt-0.5">Dimensiones de texto calculadas para uso responsive.</p>
                 </div>
 
-                <div className={`${fontClass} space-y-5 divide-y divide-gray-50`}>
+                <div className="space-y-5 divide-y divide-gray-50" style={{ fontFamily: resultFontFamily }}>
 
                   {/* Display */}
                   <div className="pt-0 space-y-1">
