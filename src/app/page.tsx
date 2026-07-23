@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { GOOGLE_FONTS, loadGoogleFont } from "@/lib/googleFonts";
 
 interface SavedProject {
   id: number;
@@ -155,6 +156,8 @@ export default function Home() {
   const [selectedFont, setSelectedFont] = useState("Plus Jakarta Sans");
   const [brandDescription, setBrandDescription] = useState("");
   const [shapePreset, setShapePreset] = useState("soft");
+  const [fontSearch, setFontSearch] = useState("");
+  const [showFontDropdown, setShowFontDropdown] = useState(false);
 
   // Output design system state
   const [tokens, setTokens] = useState<DesignSystemTokens | null>(null);
@@ -184,12 +187,30 @@ export default function Home() {
       setIsLoadingProjects(false);
     }
   };
-
+  useEffect(() => {
+    loadGoogleFont(selectedFont);
+  }, [selectedFont]);
+  const filteredFonts = GOOGLE_FONTS.filter((font) =>
+    font.toLowerCase().includes(fontSearch.toLowerCase())
+  );
   useEffect(() => {
     if (screen === "results") {
       fetchProjects();
     }
   }, [screen]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest("[data-font-selector]")) {
+        setShowFontDropdown(false);
+        setFontSearch("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
 
   const handleSaveProject = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -409,7 +430,7 @@ export default function Home() {
     return (
       <main className="min-h-screen w-full bg-gradient-to-br from-[#F3F3FF] via-white to-[#F3F3FF] py-8 px-4 sm:px-8 font-sans">
         <div className="max-w-6xl mx-auto space-y-8">
-          
+
           {/* Header Action Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 pb-6">
             <div>
@@ -425,7 +446,7 @@ export default function Home() {
                 Tipografía: <span className="font-semibold text-gray-700">{tokens.typography.fontFamily.$value}</span> | Preset: <span className="font-semibold text-gray-700 uppercase">{shapePreset}</span>
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -486,16 +507,16 @@ export default function Home() {
 
           {/* Main Layout Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
+
             {/* LEFT: Previews Section (Col 5) */}
             <div className="lg:col-span-5 space-y-6">
-              
+
               <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-slate-200/40">
                 <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-6">Vista Previa de Componentes</h2>
-                
+
                 {/* Embedded preview using the typography font class */}
                 <div className={`${fontClass} space-y-8`}>
-                  
+
                   {/* Button Preview */}
                   <div className="space-y-2">
                     <span className="text-xs text-gray-400 font-medium block">Botón ({tokens.radius.button.$value})</span>
@@ -593,10 +614,10 @@ export default function Home() {
 
             {/* RIGHT: Color Swatches & Typography Grid (Col 7) */}
             <div className="lg:col-span-7 space-y-6">
-              
+
               {/* Color Tokens Panel */}
               <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-slate-200/40 space-y-6">
-                
+
                 <div>
                   <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Paleta de Colores</h2>
                   <p className="text-xs text-gray-500 mt-0.5">Colores con roles semánticos y contrastes WCAG AA validados.</p>
@@ -611,7 +632,7 @@ export default function Home() {
                       />
                       <span className="text-[11px] font-bold text-gray-700 truncate">{item.label}</span>
                       <span className="text-[10px] font-mono text-gray-400">{item.token.$value}</span>
-                      
+
                       {item.name === "primary" && contrastReport?.primaryPair && (
                         <div className="mt-1">
                           <span className="inline-flex items-center gap-0.5 bg-[#2F9E5C]/10 text-[#2F9E5C] text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-[#2F9E5C]/20 leading-none">
@@ -620,7 +641,7 @@ export default function Home() {
                           </span>
                         </div>
                       )}
-                      
+
                       {item.name === "secondary" && contrastReport?.secondaryPair && (
                         <div className="mt-1">
                           <span className="inline-flex items-center gap-0.5 bg-[#2F9E5C]/10 text-[#2F9E5C] text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-[#2F9E5C]/20 leading-none">
@@ -629,7 +650,7 @@ export default function Home() {
                           </span>
                         </div>
                       )}
-                      
+
                       {item.name === "surface" && contrastReport?.surfacePair && (
                         <div className="mt-1">
                           <span className="inline-flex items-center gap-0.5 bg-[#2F9E5C]/10 text-[#2F9E5C] text-[9px] font-extrabold px-1.5 py-0.5 rounded border border-[#2F9E5C]/20 leading-none">
@@ -662,14 +683,14 @@ export default function Home() {
 
               {/* Typography Scale Panel */}
               <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-slate-200/40 space-y-6">
-                
+
                 <div>
                   <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Escala Tipográfica</h2>
                   <p className="text-xs text-gray-500 mt-0.5">Dimensiones de texto calculadas para uso responsive.</p>
                 </div>
 
                 <div className={`${fontClass} space-y-5 divide-y divide-gray-50`}>
-                  
+
                   {/* Display */}
                   <div className="pt-0 space-y-1">
                     <span className="text-[10px] font-mono text-gray-400 block">display: {tokens.typography.scale.display.$value}</span>
@@ -720,7 +741,7 @@ export default function Home() {
 
           {/* Instructions Section */}
           <div id="instructions-section" className="pt-6 border-t border-gray-100 space-y-6">
-            
+
             {/* Header */}
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4648D4]/10 border border-[#4648D4]/20 text-[#4648D4] text-xs font-semibold tracking-wide uppercase mb-2">
@@ -736,7 +757,7 @@ export default function Home() {
 
             {/* 4 Steps Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
+
               {/* PASO 1 */}
               <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-xl shadow-slate-200/40 flex flex-col justify-between space-y-4">
                 <div className="space-y-3">
@@ -974,11 +995,10 @@ export default function Home() {
 
                 {saveFeedback && (
                   <div
-                    className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${
-                      saveFeedback.type === "success"
+                    className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${saveFeedback.type === "success"
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                         : "bg-red-50 text-red-700 border border-red-200"
-                    }`}
+                      }`}
                   >
                     <span>{saveFeedback.message}</span>
                   </div>
@@ -1019,7 +1039,7 @@ export default function Home() {
   return (
     <main className="min-h-screen w-full bg-gradient-to-br from-[#F3F3FF] via-white to-[#F3F3FF] flex items-center justify-center p-4 sm:p-8 font-sans">
       <div className="max-w-xl w-full flex flex-col items-center gap-6">
-        
+
         {/* Logo and Intro Header */}
         <div className="text-center space-y-2 mb-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4648D4]/10 border border-[#4648D4]/20 text-[#4648D4] text-xs font-semibold tracking-wide uppercase">
@@ -1035,28 +1055,26 @@ export default function Home() {
 
         {/* Central Card */}
         <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-gray-100 w-full overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/80">
-          
+
           {/* Tab Navigation */}
           <div className="flex border-b border-gray-100 bg-gray-50/50">
             <button
               type="button"
               onClick={() => setActiveTab("existing")}
-              className={`flex-1 py-4 text-sm font-semibold transition-all border-b-2 outline-none ${
-                activeTab === "existing"
+              className={`flex-1 py-4 text-sm font-semibold transition-all border-b-2 outline-none ${activeTab === "existing"
                   ? "border-[#4648D4] text-[#4648D4] bg-white"
                   : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50/30"
-              }`}
+                }`}
             >
               Tengo mi marca
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("new")}
-              className={`flex-1 py-4 text-sm font-semibold transition-all border-b-2 outline-none ${
-                activeTab === "new"
+              className={`flex-1 py-4 text-sm font-semibold transition-all border-b-2 outline-none ${activeTab === "new"
                   ? "border-[#4648D4] text-[#4648D4] bg-white"
                   : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50/30"
-              }`}
+                }`}
             >
               Marca nueva
             </button>
@@ -1064,11 +1082,11 @@ export default function Home() {
 
           {/* Form Content */}
           <form onSubmit={handleGenerate} className="p-6 sm:p-8 space-y-6">
-            
+
             {/* Tab 1: Tengo mi marca */}
             {activeTab === "existing" && (
               <div className="space-y-5 animate-fadeIn">
-                
+
                 {/* Colors Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Primary Color */}
@@ -1129,21 +1147,79 @@ export default function Home() {
                 </div>
 
                 {/* Font Selector */}
-                <div className="space-y-2">
-                  <label htmlFor="font-selector" className="block text-xs font-bold text-[#1E1E1E] uppercase tracking-wider">
+                {/* Font Selector - Searchable */}
+                <div className="space-y-2 relative" data-font-selector>
+                  <label className="block text-xs font-bold text-[#1E1E1E] uppercase tracking-wider">
                     Tipografía Principal
                   </label>
-                  <select
-                    id="font-selector"
-                    value={selectedFont}
-                    onChange={(e) => setSelectedFont(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4648D4]/20 focus:border-[#4648D4] transition-all cursor-pointer"
-                  >
-                    <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
-                    <option value="Inter">Inter</option>
-                    <option value="Poppins">Poppins</option>
-                    <option value="DM Sans">DM Sans</option>
-                  </select>
+                  <div className="relative">
+                    <div
+                      className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm text-gray-700 cursor-pointer flex items-center justify-between focus-within:ring-2 focus-within:ring-[#4648D4]/20 focus-within:border-[#4648D4] transition-all"
+                      onClick={() => setShowFontDropdown(!showFontDropdown)}
+                    >
+                      <span style={{ fontFamily: selectedFont }} className="font-medium">
+                        {selectedFont}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 text-gray-400 transition-transform ${showFontDropdown ? "rotate-180" : ""}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+
+                    {showFontDropdown && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/50 overflow-hidden">
+                        <div className="p-2 border-b border-gray-100">
+                          <input
+                            type="text"
+                            value={fontSearch}
+                            onChange={(e) => setFontSearch(e.target.value)}
+                            placeholder="Buscar fuente..."
+                            className="w-full bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-[#4648D4]/30 focus:border-[#4648D4]/30"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="max-h-52 overflow-y-auto">
+                          {filteredFonts.length > 0 ? (
+                            filteredFonts.map((font) => (
+                              <button
+                                key={font}
+                                type="button"
+                                onMouseEnter={() => loadGoogleFont(font)}
+                                onClick={() => {
+                                  setSelectedFont(font);
+                                  setShowFontDropdown(false);
+                                  setFontSearch("");
+                                }}
+                                className={`w-full text-left px-3 py-2.5 text-sm transition-colors flex items-center justify-between ${selectedFont === font
+                                    ? "bg-[#4648D4]/5 text-[#4648D4] font-semibold"
+                                    : "text-gray-700 hover:bg-gray-50"
+                                  }`}
+                              >
+                                <span style={{ fontFamily: font }}>{font}</span>
+                                {selectedFont === font && (
+                                  <svg className="w-4 h-4 text-[#4648D4]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </button>
+                            ))
+                          ) : (
+                            <div className="px-3 py-4 text-sm text-gray-400 text-center">
+                              No se encontraron fuentes
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400" style={{ fontFamily: selectedFont }}>
+                    Vista previa: Aa Bb Cc 123
+                  </p>
                 </div>
 
               </div>
@@ -1172,7 +1248,7 @@ export default function Home() {
               <label className="block text-xs font-bold text-[#1E1E1E] uppercase tracking-wider">
                 Preset de Bordes (Formas)
               </label>
-              
+
               <div className="grid grid-cols-4 gap-2">
                 {shapePresets.map((preset) => {
                   const isSelected = shapePreset === preset.id;
@@ -1181,16 +1257,15 @@ export default function Home() {
                       key={preset.id}
                       type="button"
                       onClick={() => setShapePreset(preset.id)}
-                      className={`flex flex-col items-center justify-between p-2.5 border-2 rounded-xl transition-all outline-none duration-200 select-none ${
-                        isSelected
+                      className={`flex flex-col items-center justify-between p-2.5 border-2 rounded-xl transition-all outline-none duration-200 select-none ${isSelected
                           ? "border-[#4648D4] bg-[#4648D4]/5 ring-1 ring-[#4648D4]/30"
                           : "border-gray-100 hover:border-gray-200 bg-white hover:bg-gray-50/50"
-                      }`}
+                        }`}
                     >
                       {/* Visual Preview Box */}
                       <div className="w-full h-8 flex items-center justify-center mb-1.5">
-                        <div 
-                          className={`w-9 h-5 bg-gray-200 border border-gray-300 shadow-sm transition-all duration-200 ${preset.radiusClass}`} 
+                        <div
+                          className={`w-9 h-5 bg-gray-200 border border-gray-300 shadow-sm transition-all duration-200 ${preset.radiusClass}`}
                         />
                       </div>
                       <span className="text-[11px] font-bold text-[#1E1E1E]">
@@ -1211,11 +1286,11 @@ export default function Home() {
               className="w-full py-3.5 px-6 bg-[#4648D4] hover:bg-[#393ab3] text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-md shadow-[#4648D4]/20 hover:shadow-lg hover:shadow-[#4648D4]/30 active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-[#4648D4] focus:ring-offset-2 flex items-center justify-center gap-2 mt-4"
             >
               <span>Generar Sistema</span>
-              <svg 
-                className="w-4 h-4" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
                 strokeWidth={2}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
