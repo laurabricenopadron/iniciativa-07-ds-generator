@@ -83,6 +83,65 @@ interface ContrastReport {
   surfacePair: ContrastReportItem;
 }
 
+// --- Client-side contrast utilities ---
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  let clean = hex.replace(/^#/, "");
+  if (clean.length === 3) clean = clean.split("").map((c) => c + c).join("");
+  if (clean.length !== 6) return null;
+  const num = parseInt(clean, 16);
+  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+}
+
+function getLuminance(hex: string): number {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 0;
+  const [r, g, b] = [rgb.r, rgb.g, rgb.b].map((v) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+function getContrastRatio(c1: string, c2: string): number {
+  const l1 = getLuminance(c1);
+  const l2 = getLuminance(c2);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function ContrastIndicator({ color }: { color: string }) {
+  const ratio = getContrastRatio(color, "#FFFFFF");
+  const passesAA = ratio >= 4.5;
+  const passesAALarge = ratio >= 3;
+  const ratioText = ratio.toFixed(2) + ":1";
+
+  return (
+    <div className="flex items-center gap-2 mt-1.5">
+      <div
+        className="w-5 h-5 rounded-full border flex items-center justify-center text-[10px] font-bold"
+        style={{ backgroundColor: color, borderColor: color }}
+      >
+        <span style={{ color: "#FFFFFF" }}>A</span>
+      </div>
+      <span className="text-xs font-mono font-semibold text-gray-600">{ratioText}</span>
+      {passesAA ? (
+        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">
+          ✓ AA
+        </span>
+      ) : passesAALarge ? (
+        <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+          ~ AA Large
+        </span>
+      ) : (
+        <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full">
+          ✗ AA
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   // Navigation states: 'input' | 'loading' | 'results' | 'error'
   const [screen, setScreen] = useState<"input" | "loading" | "results" | "error">("input");
@@ -1037,6 +1096,7 @@ export default function Home() {
                         placeholder="#4648D4"
                       />
                     </div>
+                    <ContrastIndicator color={primaryColor} />
                   </div>
 
                   {/* Secondary Color */}
@@ -1064,6 +1124,7 @@ export default function Home() {
                         placeholder="#10B981"
                       />
                     </div>
+                    <ContrastIndicator color={secondaryColor} />
                   </div>
                 </div>
 
