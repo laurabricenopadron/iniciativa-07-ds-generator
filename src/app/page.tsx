@@ -996,8 +996,8 @@ export default function Home() {
                 {saveFeedback && (
                   <div
                     className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 ${saveFeedback.type === "success"
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                        : "bg-red-50 text-red-700 border border-red-200"
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      : "bg-red-50 text-red-700 border border-red-200"
                       }`}
                   >
                     <span>{saveFeedback.message}</span>
@@ -1062,8 +1062,8 @@ export default function Home() {
               type="button"
               onClick={() => setActiveTab("existing")}
               className={`flex-1 py-4 text-sm font-semibold transition-all border-b-2 outline-none ${activeTab === "existing"
-                  ? "border-[#4648D4] text-[#4648D4] bg-white"
-                  : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50/30"
+                ? "border-[#4648D4] text-[#4648D4] bg-white"
+                : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50/30"
                 }`}
             >
               Tengo mi marca
@@ -1072,8 +1072,8 @@ export default function Home() {
               type="button"
               onClick={() => setActiveTab("new")}
               className={`flex-1 py-4 text-sm font-semibold transition-all border-b-2 outline-none ${activeTab === "new"
-                  ? "border-[#4648D4] text-[#4648D4] bg-white"
-                  : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50/30"
+                ? "border-[#4648D4] text-[#4648D4] bg-white"
+                : "border-transparent text-gray-400 hover:text-gray-600 hover:bg-gray-50/30"
                 }`}
             >
               Marca nueva
@@ -1196,8 +1196,8 @@ export default function Home() {
                                   setFontSearch("");
                                 }}
                                 className={`w-full text-left px-3 py-2.5 text-sm transition-colors flex items-center justify-between ${selectedFont === font
-                                    ? "bg-[#4648D4]/5 text-[#4648D4] font-semibold"
-                                    : "text-gray-700 hover:bg-gray-50"
+                                  ? "bg-[#4648D4]/5 text-[#4648D4] font-semibold"
+                                  : "text-gray-700 hover:bg-gray-50"
                                   }`}
                               >
                                 <span style={{ fontFamily: font }}>{font}</span>
@@ -1258,8 +1258,8 @@ export default function Home() {
                       type="button"
                       onClick={() => setShapePreset(preset.id)}
                       className={`flex flex-col items-center justify-between p-2.5 border-2 rounded-xl transition-all outline-none duration-200 select-none ${isSelected
-                          ? "border-[#4648D4] bg-[#4648D4]/5 ring-1 ring-[#4648D4]/30"
-                          : "border-gray-100 hover:border-gray-200 bg-white hover:bg-gray-50/50"
+                        ? "border-[#4648D4] bg-[#4648D4]/5 ring-1 ring-[#4648D4]/30"
+                        : "border-gray-100 hover:border-gray-200 bg-white hover:bg-gray-50/50"
                         }`}
                     >
                       {/* Visual Preview Box */}
